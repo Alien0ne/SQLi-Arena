@@ -1,0 +1,15 @@
+{
+    "store": {
+        "user:session:a1b2c3": "{\"uid\":1,\"role\":\"admin\",\"token\":\"eyJhbGciOi...\"}",
+        "user:session:d4e5f6": "{\"uid\":2,\"role\":\"user\",\"token\":\"eyJhbGciOi...\"}",
+        "cache:api_keys": "{\"prod\":\"sk-live-abc123\",\"dev\":\"sk-test-xyz789\"}",
+        "internal:flag": "FLAG{rd_sl4v30f_3xf1l}",
+        "db:credentials": "{\"host\":\"db.internal\",\"user\":\"root\",\"pass\":\"s3cretDBp4ss\"}"
+    },
+    "replication": {
+        "role": "master",
+        "connected_slaves": 0,
+        "master_repl_offset": 0
+    },
+    "description": "SLAVEOF data exfiltration via rogue replica"
+}

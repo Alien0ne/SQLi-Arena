@@ -1,0 +1,24 @@
+{
+    "entities": {
+        "Article": {
+            "columns": ["id", "title", "content", "author", "cached"],
+            "data": [
+                {"id": 1, "title": "Getting Started", "content": "Welcome to our platform...", "author": "admin", "cached": true},
+                {"id": 2, "title": "Security Guide", "content": "Always use parameterized queries...", "author": "admin", "cached": true},
+                {"id": 3, "title": "API Documentation", "content": "Endpoints available at /api/v2...", "author": "dev", "cached": false}
+            ]
+        }
+    },
+    "cache": {
+        "Article#1": {"id": 1, "title": "Getting Started", "content": "Welcome to our platform...", "author": "admin"},
+        "Article#2": {"id": 2, "title": "Security Guide", "content": "Always use parameterized queries...", "author": "admin"},
+        "SystemConfig#flag": {"value": "FLAG{hq_c4ch3_p01s0n1ng}"}
+    },
+    "cache_config": {
+        "provider": "ehcache",
+        "region": "default",
+        "max_entries": 1000,
+        "ttl": 3600
+    },
+    "description": "Hibernate second-level cache poisoning"
+}

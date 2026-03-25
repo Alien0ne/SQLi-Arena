@@ -1,0 +1,19 @@
+{
+    "store": {
+        "admin:settings": "{\"theme\":\"dark\",\"lang\":\"en\"}",
+        "admin:users_count": "47",
+        "backup:last_run": "2026-03-22T04:00:00Z",
+        "flag_data": "FLAG{rd_c0nf1g_s3t_wr1t3}"
+    },
+    "config": {
+        "dir": "/var/lib/redis",
+        "dbfilename": "dump.rdb",
+        "requirepass": "",
+        "bind": "127.0.0.1"
+    },
+    "filesystem": {
+        "/var/lib/redis/dump.rdb": "[binary data]",
+        "/var/www/html/": "[webroot directory]"
+    },
+    "description": "Admin panel with CONFIG SET file write vulnerability"
+}

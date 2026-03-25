@@ -1,0 +1,28 @@
+{
+    "entities": {
+        "Product": {
+            "columns": ["id", "name", "price", "category"],
+            "data": [
+                {"id": 1, "name": "Wireless Mouse", "price": 29.99, "category": "Electronics"},
+                {"id": 2, "name": "USB Keyboard", "price": 49.99, "category": "Electronics"},
+                {"id": 3, "name": "Monitor Stand", "price": 34.99, "category": "Accessories"},
+                {"id": 4, "name": "Laptop Bag", "price": 59.99, "category": "Accessories"}
+            ]
+        },
+        "AdminCredential": {
+            "columns": ["id", "username", "password_hash", "secret_note"],
+            "data": [
+                {"id": 1, "username": "admin", "password_hash": "bcrypt:$2y$10$abc...", "secret_note": "FLAG{hq_3nt1ty_n4m3_1nj}"},
+                {"id": 2, "username": "superadmin", "password_hash": "bcrypt:$2y$10$xyz...", "secret_note": "Backup key: BK-9921"}
+            ]
+        },
+        "AuditLog": {
+            "columns": ["id", "action", "timestamp", "user_id"],
+            "data": [
+                {"id": 1, "action": "LOGIN", "timestamp": "2026-03-22 10:00:00", "user_id": 1},
+                {"id": 2, "action": "UPDATE_PRODUCT", "timestamp": "2026-03-22 11:30:00", "user_id": 1}
+            ]
+        }
+    },
+    "description": "Entity name injection -- user controls FROM clause entity name"
+}

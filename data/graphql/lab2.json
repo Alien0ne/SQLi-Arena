@@ -1,0 +1,40 @@
+{
+    "schema": {
+        "types": {
+            "Query": {
+                "fields": {
+                    "user": {"type": "User", "args": {"id": "Int!"}},
+                    "product": {"type": "Product", "args": {"id": "Int!"}}
+                }
+            },
+            "User": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "username": {"type": "String"},
+                    "email": {"type": "String"},
+                    "secretFlag": {"type": "String", "hidden": true},
+                    "internalNotes": {"type": "String", "hidden": true}
+                }
+            },
+            "Product": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "name": {"type": "String"},
+                    "price": {"type": "Float"}
+                }
+            }
+        }
+    },
+    "data": {
+        "users": [
+            {"id": 1, "username": "alice", "email": "alice@example.com", "secretFlag": "FLAG{gq_f13ld_sugg3st10n}", "internalNotes": "VIP customer"},
+            {"id": 2, "username": "bob", "email": "bob@example.com", "secretFlag": "no_flag_here", "internalNotes": "Standard account"}
+        ],
+        "products": [
+            {"id": 1, "name": "Widget", "price": 9.99},
+            {"id": 2, "name": "Gadget", "price": 19.99}
+        ]
+    },
+    "field_suggestions": true,
+    "description": "GraphQL field suggestion exploitation -- error messages leak field names"
+}

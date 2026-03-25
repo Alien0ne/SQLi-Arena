@@ -1,0 +1,19 @@
+{
+    "employees": [
+        {"_id": 1, "name": "Alice Chen", "department": "engineering", "level": 3},
+        {"_id": 2, "name": "Bob Martinez", "department": "marketing", "level": 2},
+        {"_id": 3, "name": "Carol Wu", "department": "engineering", "level": 4},
+        {"_id": 4, "name": "Dave Johnson", "department": "hr", "level": 2}
+    ],
+    "salaries": [
+        {"_id": 1, "employee_id": 1, "amount": 95000, "currency": "USD"},
+        {"_id": 2, "employee_id": 2, "amount": 72000, "currency": "USD"},
+        {"_id": 3, "employee_id": 3, "amount": 110000, "currency": "USD"},
+        {"_id": 4, "employee_id": 4, "amount": 68000, "currency": "USD"}
+    ],
+    "secrets": [
+        {"_id": 1, "key": "admin_token", "value": "tok-a8f3b2c1"},
+        {"_id": 2, "key": "flag", "value": "FLAG{mg_l00kup_cr0ss_c0ll3ct}"},
+        {"_id": 3, "key": "backup_key", "value": "bk-9d4e7f0a"}
+    ]
+}

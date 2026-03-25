@@ -1,0 +1,33 @@
+{
+    "schema": {
+        "types": {
+            "Query": {
+                "fields": {
+                    "user": {"type": "User", "args": {"id": "Int!"}},
+                    "users": {"type": "[User]", "args": {}}
+                }
+            },
+            "User": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "name": {"type": "String"},
+                    "email": {"type": "String"},
+                    "password": {"type": "String", "restricted": true},
+                    "apiKey": {"type": "String", "restricted": true},
+                    "flag": {"type": "String", "restricted": true}
+                }
+            }
+        }
+    },
+    "data": {
+        "users": [
+            {"id": 1, "name": "Alice", "email": "alice@corp.com", "password": "hashed_pw_alice", "apiKey": "ak-alice-1234", "flag": "FLAG{gq_4l14s_4uth_byp4ss}"},
+            {"id": 2, "name": "Bob", "email": "bob@corp.com", "password": "hashed_pw_bob", "apiKey": "ak-bob-5678", "flag": "not_the_flag"}
+        ]
+    },
+    "access_control": {
+        "restricted_fields": ["password", "apiKey", "flag"],
+        "check_mode": "query_name_only"
+    },
+    "description": "Alias-based auth bypass -- ACL checks query name not aliases"
+}

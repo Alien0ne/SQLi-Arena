@@ -1,0 +1,56 @@
+{
+    "schema": {
+        "types": {
+            "Query": {
+                "fields": {
+                    "user": {"type": "User", "args": {"id": "Int!"}},
+                    "users": {"type": "[User]", "args": {}},
+                    "product": {"type": "Product", "args": {"id": "Int!"}},
+                    "products": {"type": "[Product]", "args": {"category": "String"}}
+                }
+            },
+            "User": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "username": {"type": "String"},
+                    "email": {"type": "String"},
+                    "role": {"type": "String"}
+                }
+            },
+            "Product": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "name": {"type": "String"},
+                    "price": {"type": "Float"},
+                    "category": {"type": "String"}
+                }
+            },
+            "SecretFlag": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "flag": {"type": "String"},
+                    "description": {"type": "String"}
+                }
+            },
+            "Mutation": {
+                "fields": {
+                    "updateProfile": {"type": "User", "args": {"id": "Int!", "email": "String"}}
+                }
+            }
+        }
+    },
+    "data": {
+        "users": [
+            {"id": 1, "username": "alice", "email": "alice@example.com", "role": "user"},
+            {"id": 2, "username": "admin", "email": "admin@example.com", "role": "admin"}
+        ],
+        "products": [
+            {"id": 1, "name": "Widget", "price": 9.99, "category": "tools"},
+            {"id": 2, "name": "Gadget", "price": 19.99, "category": "electronics"}
+        ],
+        "secretflags": [
+            {"id": 1, "flag": "FLAG{gq_1ntr0sp3ct_sch3m4}", "description": "Introspection discovery flag"}
+        ]
+    },
+    "description": "GraphQL API with introspection enabled -- discover hidden types"
+}

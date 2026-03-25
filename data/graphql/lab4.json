@@ -1,0 +1,42 @@
+{
+    "schema": {
+        "types": {
+            "Query": {
+                "fields": {
+                    "me": {"type": "User", "args": {}}
+                }
+            },
+            "Mutation": {
+                "fields": {
+                    "verifyOtp": {"type": "OtpResult", "args": {"otp": "String!"}}
+                }
+            },
+            "User": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "username": {"type": "String"},
+                    "email": {"type": "String"}
+                }
+            },
+            "OtpResult": {
+                "fields": {
+                    "success": {"type": "Boolean"},
+                    "message": {"type": "String"},
+                    "flag": {"type": "String"}
+                }
+            }
+        }
+    },
+    "data": {
+        "current_user": {"id": 1, "username": "hacker", "email": "hacker@test.com"},
+        "valid_otp": "1337",
+        "flag": "FLAG{gq_b4tch1ng_4tt4ck}"
+    },
+    "rate_limit": {
+        "enabled": true,
+        "max_per_request": 1,
+        "window_seconds": 60,
+        "note": "Rate limit is per HTTP request, not per operation in batch"
+    },
+    "description": "Batching attack -- bypass rate limiting via batched mutations"
+}

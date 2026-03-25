@@ -1,0 +1,33 @@
+{
+    "entities": {
+        "User": {
+            "class_name": "com.webapp.model.User",
+            "columns": ["id", "username", "email", "role"],
+            "metadata": {
+                "table": "app_users",
+                "schema": "public",
+                "catalog": "webapp_db",
+                "discriminator": "USER_TYPE"
+            },
+            "data": [
+                {"id": 1, "username": "jdoe", "email": "jdoe@corp.local", "role": "user"},
+                {"id": 2, "username": "admin", "email": "admin@corp.local", "role": "admin"}
+            ]
+        },
+        "SecretVault": {
+            "class_name": "com.webapp.model.internal.SecretVault",
+            "columns": ["id", "vault_key", "vault_value"],
+            "metadata": {
+                "table": "secret_vault",
+                "schema": "internal",
+                "catalog": "webapp_db",
+                "discriminator": "VAULT_TYPE"
+            },
+            "data": [
+                {"id": 1, "vault_key": "master_flag", "vault_value": "FLAG{hq_cl4ss_m3t4d4t4}"},
+                {"id": 2, "vault_key": "db_password", "vault_value": "pr0d_p4ssw0rd_2026"}
+            ]
+        }
+    },
+    "description": "Dot-notation .class metadata leakage in HQL property access"
+}

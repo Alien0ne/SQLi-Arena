@@ -1,0 +1,49 @@
+{
+    "schema": {
+        "types": {
+            "Query": {
+                "fields": {
+                    "user": {"type": "User", "args": {"id": "Int!"}}
+                }
+            },
+            "User": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "name": {"type": "String"},
+                    "email": {"type": "String"},
+                    "posts": {"type": "[Post]"},
+                    "secretField": {"type": "String"}
+                }
+            },
+            "Post": {
+                "fields": {
+                    "id": {"type": "Int"},
+                    "title": {"type": "String"},
+                    "content": {"type": "String"},
+                    "author": {"type": "User"}
+                }
+            }
+        }
+    },
+    "data": {
+        "users": [
+            {
+                "id": 1, "name": "Alice", "email": "alice@blog.com",
+                "secretField": "FLAG{gq_n3st3d_d33p_qu3ry}",
+                "posts": [1, 2]
+            },
+            {
+                "id": 2, "name": "Bob", "email": "bob@blog.com",
+                "secretField": "no_flag_here",
+                "posts": [3]
+            }
+        ],
+        "posts": [
+            {"id": 1, "title": "Hello World", "content": "My first post", "author": 1},
+            {"id": 2, "title": "GraphQL Tips", "content": "Use depth limiting!", "author": 1},
+            {"id": 3, "title": "Security 101", "content": "Always validate input", "author": 2}
+        ]
+    },
+    "depth_limit": null,
+    "description": "Nested query DoS with circular references -- extract deeply nested data"
+}

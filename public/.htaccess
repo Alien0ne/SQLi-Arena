@@ -1,0 +1,38 @@
+RewriteEngine On
+RewriteBase /SQLi-Arena/public/
+
+# Static assets — pass through
+RewriteRule ^assets/ - [L]
+
+# /SQLi-Arena/control-panel → control-panel.php
+RewriteRule ^control-panel/?$ control-panel.php [L,QSA]
+
+# /SQLi-Arena/learning-path → learning-path.php
+RewriteRule ^learning-path/?$ learning-path.php [L,QSA]
+
+# /SQLi-Arena/learning-path/{phase} → learning-path.php?phase={phase}
+RewriteRule ^learning-path/([a-z0-9-]+)/?$ learning-path.php?phase=$1 [L,QSA]
+
+# /SQLi-Arena/attack-types → attack-types.php
+RewriteRule ^attack-types/?$ attack-types.php [L,QSA]
+
+# /SQLi-Arena/attack-types/{slug} → attack-types.php?topic={slug}
+RewriteRule ^attack-types/([a-z0-9_-]+)/?$ attack-types.php?topic=$1 [L,QSA]
+
+# /SQLi-Arena/cheatsheet → cheatsheet.php
+RewriteRule ^cheatsheet/?$ cheatsheet.php [L,QSA]
+
+# /SQLi-Arena/{engine} → labs.php?db={engine}
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/?$ labs.php?db=$1 [L,QSA]
+
+# /SQLi-Arena/{engine}/lab{N}/source → lab.php?lab={engine}/lab{N}&mode=white
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/source/?$ lab.php?lab=$1/lab$2&mode=white [L,QSA]
+
+# /SQLi-Arena/{engine}/lab{N}/solution → lab.php?lab={engine}/lab{N}&mode=solution
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/solution/?$ lab.php?lab=$1/lab$2&mode=solution [L,QSA]
+
+# /SQLi-Arena/{engine}/lab{N} → lab.php?lab={engine}/lab{N}&mode=black
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/?$ lab.php?lab=$1/lab$2&mode=black [L,QSA]
+
+# /SQLi-Arena/ → index.php
+RewriteRule ^$ index.php [L]

@@ -1,0 +1,15 @@
+{
+    "store": {
+        "counter:visits": "4821",
+        "counter:logins": "312",
+        "analytics:daily": "{\"2026-03-22\":1500,\"2026-03-23\":1620}",
+        "flag_store": "FLAG{rd_lu4_3v4l_1nj3ct}",
+        "config:lua_enabled": "true",
+        "rate_limit:api": "100"
+    },
+    "lua_scripts": {
+        "increment": "local val = redis.call('GET', KEYS[1]); val = tonumber(val) + ARGV[1]; redis.call('SET', KEYS[1], val); return val;",
+        "get_stats": "local visits = redis.call('GET', 'counter:visits'); local logins = redis.call('GET', 'counter:logins'); return visits .. '/' .. logins;"
+    },
+    "description": "Analytics dashboard with Lua EVAL injection"
+}

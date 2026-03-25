@@ -1,0 +1,12 @@
+{
+    "store": {
+        "user:1001": "{\"name\":\"alice\",\"email\":\"alice@corp.local\",\"role\":\"user\"}",
+        "user:1002": "{\"name\":\"bob\",\"email\":\"bob@corp.local\",\"role\":\"admin\"}",
+        "session:abc123": "{\"user_id\":1001,\"expires\":\"2026-12-31\"}",
+        "config:app_name": "RedisKV Store v2.1",
+        "secret_key": "FLAG{rd_crlf_pr0t0c0l_1nj}",
+        "config:max_connections": "100",
+        "config:timeout": "30"
+    },
+    "description": "Key-value store with CRLF injection vulnerability in SET command"
+}

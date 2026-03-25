@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /SQLi-Arena/
+
+# If requesting a real file/dir in public/, serve it directly
+RewriteCond %{REQUEST_URI} ^/SQLi-Arena/public/
+RewriteRule ^ - [L]
+
+# Route clean URLs to public/
+RewriteRule ^(.*)$ public/$1 [L]

@@ -1,0 +1,23 @@
+{
+    "entities": {
+        "Employee": {
+            "columns": ["id", "name", "department", "salary"],
+            "data": [
+                {"id": 1, "name": "Alice Chen", "department": "Engineering", "salary": 95000},
+                {"id": 2, "name": "Bob Smith", "department": "Marketing", "salary": 72000},
+                {"id": 3, "name": "Carol Jones", "department": "Engineering", "salary": 88000},
+                {"id": 4, "name": "Dave Wilson", "department": "HR", "salary": 67000}
+            ]
+        }
+    },
+    "native_tables": {
+        "system_secrets": {
+            "columns": ["id", "secret_name", "secret_value"],
+            "data": [
+                {"id": 1, "secret_name": "flag", "secret_value": "FLAG{hq_n4t1v3_qu3ry_3sc}"},
+                {"id": 2, "secret_name": "api_key", "secret_value": "sk-prod-a8f3b2c1d4e5"}
+            ]
+        }
+    },
+    "description": "Native query escape -- break out of HQL into raw SQL"
+}

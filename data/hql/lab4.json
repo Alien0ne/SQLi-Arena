@@ -1,0 +1,22 @@
+{
+    "entities": {
+        "Order": {
+            "columns": ["id", "customer_name", "product", "amount", "status"],
+            "data": [
+                {"id": 1, "customer_name": "alice", "product": "Widget A", "amount": 150.00, "status": "completed"},
+                {"id": 2, "customer_name": "bob", "product": "Widget B", "amount": 299.99, "status": "pending"},
+                {"id": 3, "customer_name": "charlie", "product": "Widget C", "amount": 75.50, "status": "completed"},
+                {"id": 4, "customer_name": "alice", "product": "Widget D", "amount": 420.00, "status": "shipped"},
+                {"id": 5, "customer_name": "dave", "product": "Widget E", "amount": 89.99, "status": "completed"}
+            ]
+        },
+        "InternalConfig": {
+            "columns": ["id", "config_key", "config_value"],
+            "data": [
+                {"id": 1, "config_key": "flag", "config_value": "FLAG{hq_cr1t3r14_4p1_byp4ss}"},
+                {"id": 2, "config_key": "admin_email", "config_value": "admin@internal.corp"}
+            ]
+        }
+    },
+    "description": "Criteria API bypass -- inject into dynamic criteria restrictions"
+}

@@ -1,0 +1,7 @@
+{
+    "users": [
+        {"_id": 1, "username": "admin", "password": "FLAG{mg_js0n_p4r4m_p0llut3}", "email": "admin@nosql-corp.io", "role": "admin"},
+        {"_id": 2, "username": "support", "password": "supp0rt2026", "email": "support@nosql-corp.io", "role": "support"},
+        {"_id": 3, "username": "demo", "password": "demoAccount", "email": "demo@nosql-corp.io", "role": "demo"}
+    ]
+}

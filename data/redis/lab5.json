@@ -1,0 +1,15 @@
+{
+    "store": {
+        "app:version": "6.2.7",
+        "app:modules_loaded": "[]",
+        "app:flag": "FLAG{rd_m0dul3_l04d_rc3}",
+        "module:whitelist": "[]"
+    },
+    "server_info": {
+        "redis_version": "6.2.7",
+        "os": "Linux 5.15.0 x86_64",
+        "module_dir": "/usr/lib/redis/modules",
+        "loaded_modules": []
+    },
+    "description": "MODULE LOAD RCE via malicious shared object"
+}
