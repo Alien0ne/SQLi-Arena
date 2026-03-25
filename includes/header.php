@@ -34,7 +34,7 @@
             <a href="<?= url_page('control-panel') ?>" class="nav-link">
                 Control Panel
             </a>
-            <button id="themeToggle" class="nav-link theme-btn" onclick="toggleTheme()" title="Toggle theme">
+            <button id="themeToggle" class="nav-link theme-btn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
                 <span id="themeIcon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon-dark">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>

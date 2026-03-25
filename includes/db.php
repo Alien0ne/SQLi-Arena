@@ -23,7 +23,8 @@ if (!preg_match('/^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|gr
 $engine = $m[1];
 $labNum = (int)$m[2];
 
-if ($labNum < LAB_MIN || $labNum > LAB_MAX) {
+$maxLab = LAB_COUNTS[$engine] ?? 0;
+if ($labNum < LAB_MIN || $labNum > $maxLab) {
     die("Invalid lab number");
 }
 
@@ -171,4 +172,16 @@ switch ($engine) {
 
     default:
         die("Database engine '{$engine}' is not yet implemented");
+}
+
+if (isset($driver_missing) && $conn === null) {
+    $driverMessage = htmlspecialchars($driver_missing);
+    echo "<div class='card'>";
+    echo "<h3>Driver Not Available</h3>";
+    echo "<p>The <strong>{$driverMessage}</strong> driver is not installed on this server. ";
+    echo "This lab requires it to function.</p>";
+    echo "<p style='margin-top:12px;'><strong>To install:</strong> Run <code>sudo bash install.sh</code> from the project root, ";
+    echo "or install the extension manually.</p>";
+    echo "</div>";
+    return; // Stop processing the lab file
 }

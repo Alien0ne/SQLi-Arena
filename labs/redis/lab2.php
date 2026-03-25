@@ -8,11 +8,11 @@ $verify_error = null;
    Real Redis server with Lua scripting
    =========================== */
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{rd_lu4_3v4l_1nj3ct}') {
         $_SESSION['redis_lab2_solved'] = true;
-        header("Location: " . url_lab_from_slug("redis/lab2", $mode));
+        header("Location: " . url_lab_from_slug("redis/lab2", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -26,7 +26,7 @@ if (isset($_POST['flag_field'])) {
 
     <h4>Scenario</h4>
     <p>
-        The Analytics Dashboard uses Redis Lua scripting (EVAL) to compute server-side
+        An analytics dashboard uses Redis Lua scripting (EVAL) to compute server-side
         statistics. A counter name provided by the user is embedded directly into the
         Lua script without sanitization.
     </p>
@@ -48,12 +48,12 @@ if (isset($_POST['flag_field'])) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-        <button type="submit" class="btn btn-primary">Submit Flag</button>
+        <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+        <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
     <?php if ($verify_error): ?>
@@ -89,7 +89,7 @@ if (isset($_POST['flag_field'])) {
         $luaScript = "local val = redis.call('GET', '{$redisPrefix}counter:{$counterName}'); return val";
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Lua Script Construction</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">Template: </span>local val = redis.call(\'GET\', \'' . htmlspecialchars($redisPrefix) . 'counter:{{USER_INPUT}}\'); return val<br>';
@@ -119,7 +119,7 @@ if (isset($_POST['flag_field'])) {
 
         $evalLog[] = ['result' => $result, 'type' => 'result'];
 
-        echo '<div class="terminal">';
+        echo '<div class="terminal query-output">';
         echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">EVAL Result</span></div>';
         echo '<div class="terminal-body">';
 

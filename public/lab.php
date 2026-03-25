@@ -22,7 +22,7 @@ if (!is_readable($labFile)) {
     die("<div class='container'><div class='card'><h3>Lab file not found</h3></div></div>");
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab']) && csrf_verify()) {
     unset($_SESSION[$solvedKey]);
 
     // Also reset the actual database for this lab
@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab'])) {
     $labNum = (int)$lm[1];
     resetLabDatabase($engine, $labNum);
 
-    header("Location: " . url_lab_from_slug($lab));
+    $resetRef = $_GET['ref'] ?? '';
+    header("Location: " . url_lab_from_slug($lab, 'black', $resetRef));
     exit;
 }
 ?>
@@ -48,26 +49,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab'])) {
     <?php endif; ?>
 
     <!-- MODE BAR -->
-    <?php $refQS = $ref ? '?ref=' . urlencode($ref) : ''; ?>
     <div class="mode-bar anim anim-d1">
         <div class="mode-tabs">
-            <a href="<?= url_lab_from_slug($lab, 'black') . $refQS ?>"
+            <a href="<?= url_lab_from_slug($lab, 'black', $ref) ?>"
                class="mode-tab <?= $mode === 'black' ? 'active' : '' ?>">
                 black-box
             </a>
-            <a href="<?= url_lab_from_slug($lab, 'white') . $refQS ?>"
+            <a href="<?= url_lab_from_slug($lab, 'white', $ref) ?>"
                class="mode-tab <?= $mode === 'white' ? 'active' : '' ?>">
                 white-box
             </a>
         </div>
 
         <div class="mode-actions">
-            <button class="btn btn-ghost btn-sm" onclick="openSolutionModal()">
+            <?php if ($mode === 'black'): ?>
+                <label class="toggle-switch" id="queryToggle">
+                    <input type="checkbox" onchange="toggleQueryVisibility()">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">show query</span>
+                </label>
+            <?php endif; ?>
+
+            <button class="btn btn-ghost btn-sm" onclick="openSolutionModal()" aria-label="View solution">
                 solution
             </button>
 
             <?php if (!empty($_SESSION[$solvedKey])): ?>
                 <form method="POST" style="margin:0;">
+                    <?= csrf_field() ?>
                     <button type="submit" name="reset_lab" class="btn btn-danger btn-sm">
                         reset lab
                     </button>
@@ -113,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab'])) {
     <?php endif; ?>
 
     <!-- SOLUTION MODAL -->
-    <div id="solutionModal" class="modal-overlay hidden">
+    <div id="solutionModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
         <div class="modal-box">
             <h3>// view solution?</h3>
             <p>
@@ -121,8 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab'])) {
                 Try solving the lab yourself first.
             </p>
             <div class="modal-actions">
-                <button class="btn btn-ghost" onclick="closeSolutionModal()">cancel</button>
-                <a href="<?= url_lab_from_slug($lab, 'solution') ?>" class="btn btn-primary">
+                <button class="btn btn-ghost" onclick="closeSolutionModal()" aria-label="Close">cancel</button>
+                <a href="<?= url_lab_from_slug($lab, 'solution', $ref) ?>" class="btn btn-primary">
                     show solution
                 </a>
             </div>

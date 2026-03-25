@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     The Order Management system has two interfaces: a structured Criteria API filter and an
     "advanced" SQL Restriction feature. The SQL Restriction passes user input directly

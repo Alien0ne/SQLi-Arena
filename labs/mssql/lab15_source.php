@@ -25,7 +25,7 @@ try {
     $conn->query($query);
     echo "Visit logged.";
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }
 
 // Display recent visits

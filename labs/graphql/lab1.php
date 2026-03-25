@@ -8,11 +8,11 @@ $verify_error = null;
    Real GraphQL backend via Node.js Apollo Server
    =========================== */
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{gq_1ntr0sp3ct_sch3m4}') {
         $_SESSION['graphql_lab1_solved'] = true;
-        header("Location: " . url_lab_from_slug("graphql/lab1", $mode));
+        header("Location: " . url_lab_from_slug("graphql/lab1", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -43,19 +43,13 @@ function graphql_lab1_query($conn, $queryStr) {
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Backend Unavailable</strong>: <?= htmlspecialchars($driver_missing) ?> is not running.
-    Start the Node.js Apollo Server to use this lab.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
     <h3>Lab 1. Introspection Schema Discovery</h3>
     <h4>Scenario</h4>
     <p>
-        The Product API exposes a GraphQL endpoint. The API serves user and product data.
+        A product API exposes a GraphQL endpoint that serves user and product data.
         However, introspection is enabled, allowing anyone to discover the full schema
         including hidden types and fields.
     </p>
@@ -72,7 +66,7 @@ function graphql_lab1_query($conn, $queryStr) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <?php if (!empty($_SESSION['graphql_lab1_solved'])): ?>
@@ -84,8 +78,8 @@ function graphql_lab1_query($conn, $queryStr) {
             <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
         <?php endif; ?>
         <form method="POST" class="form-row">
-            <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-            <button type="submit" class="btn btn-primary">Submit Flag</button>
+            <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+            <button type="submit" class="btn btn-primary">Verify</button>
         </form>
     <?php endif; ?>
 </div>
@@ -104,7 +98,8 @@ function graphql_lab1_query($conn, $queryStr) {
 <div class="card">
     <h4>GraphQL API. Query Explorer</h4>
     <p>Enter a GraphQL query to execute against the API.</p>
-    <form method="POST" action="?lab=graphql/lab1&mode=<?= htmlspecialchars($mode) ?>&execute=1">
+    <form method="POST" action="?lab=graphql/lab1&mode=<?= htmlspecialchars($mode) ?>">
+        <input type="hidden" name="execute" value="1">
         <textarea name="query" rows="6" class="input" style="font-family:'JetBrains Mono',monospace;width:100%;resize:vertical;" placeholder='{ users { id, username, email } }'><?= htmlspecialchars($_POST['query'] ?? '') ?></textarea>
         <button type="submit" class="btn btn-primary" style="margin-top:8px;">Execute Query</button>
     </form>
@@ -112,12 +107,12 @@ function graphql_lab1_query($conn, $queryStr) {
     <?php
     if (isset($_POST['execute']) && isset($_POST['query'])) {
         if (!$conn) {
-            echo '<div class="result-warning result-box"><strong>GraphQL backend is not running.</strong> Start the Node.js Apollo Server at ' . htmlspecialchars(GRAPHQL_API_URL) . ' to use this lab.</div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> GraphQL backend is not running. Is the Docker container up?</div>';
         } else {
             $queryStr = $_POST['query'];
 
             if ($mode === 'white') {
-                echo '<div class="terminal">';
+                echo '<div class="terminal query-output">';
                 echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Query Received</span></div>';
                 echo '<div class="terminal-body">';
                 echo '<span class="prompt">POST /graphql/lab1</span><br>';
@@ -127,7 +122,7 @@ function graphql_lab1_query($conn, $queryStr) {
 
             $result = graphql_lab1_query($conn, $queryStr);
 
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">GraphQL Response</span></div>';
             echo '<div class="terminal-body">';
             echo '<pre style="margin:0;color:inherit;">' . htmlspecialchars(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . '</pre>';

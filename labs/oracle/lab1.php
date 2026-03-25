@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_un10n_fr0m_du4l}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT password FROM users WHERE username='admin'";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['PASSWORD']) {
         $_SESSION['oracle_lab1_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab1", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab1", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,12 +27,11 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This user lookup feature queries an Oracle database. The input is directly concatenated
-        into the SQL query. Oracle requires every SELECT to have a FROM clause --
-        use <code>FROM DUAL</code> for constant values. Oracle uses <code>WHERE ROWNUM &lt;= N</code>
-        instead of <code>LIMIT</code>. String concatenation uses <code>||</code>.
+        A user lookup feature queries an Oracle database. The input is directly concatenated
+        into the SQL query. Oracle requires every SELECT to have a FROM clause — use
+        <code>FROM DUAL</code> for constant values. Oracle uses <code>WHERE ROWNUM &lt;= N</code>
+        instead of <code>LIMIT</code>, and string concatenation uses <code>||</code>.
     </p>
-    <p><strong>Table Schema:</strong> <code>users(id NUMBER, username VARCHAR2, password VARCHAR2, email VARCHAR2)</code></p>
 
     <h4>Objective</h4>
     <p>
@@ -56,7 +53,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -92,7 +89,7 @@ if (isset($_POST['username'])) {
     $input = $_POST['username'];
     $query = "SELECT id, username, email FROM users WHERE username = '$input'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -129,8 +126,8 @@ if (isset($_POST['username'])) {
         }
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

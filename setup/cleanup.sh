@@ -8,7 +8,7 @@
 # Usage: sudo bash setup/cleanup.sh
 # ============================================================
 
-set -e
+# Don't use set -e — cleanup steps should continue even if individual ones fail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -62,7 +62,7 @@ if command -v docker &>/dev/null; then
     fi
 
     # Also catch any orphaned containers
-    for container in sqli-arena-mssql sqli-arena-oracle sqli-arena-mongodb sqli-arena-redis sqli-arena-hql sqli-arena-graphql; do
+    for container in sqli-arena-mssql sqli-arena-mssql-internal sqli-arena-oracle sqli-arena-mongodb sqli-arena-redis sqli-arena-hql sqli-arena-graphql; do
         if docker ps -a --format '{{.Names}}' | grep -q "^${container}$"; then
             docker rm -f "$container" 2>/dev/null || true
             echo -e "  ${GREEN}[+]${NC} Removed container: $container"
@@ -79,7 +79,7 @@ echo ""
 echo -e "${YELLOW}[2/8] Removing Docker volumes...${NC}"
 
 if command -v docker &>/dev/null; then
-    for vol in $(docker volume ls --format '{{.Name}}' 2>/dev/null | grep -E "sqli-arena|mssql-data|oracle-data|mongodb-data|redis-data"); do
+    for vol in $(docker volume ls --format '{{.Name}}' 2>/dev/null | grep -E "sqli-arena|mssql-data|mssql-internal-data|oracle-data|mongodb-data|redis-data"); do
         docker volume rm "$vol" 2>/dev/null || true
         echo -e "  ${GREEN}[+]${NC} Removed volume: $vol"
     done
@@ -152,17 +152,18 @@ echo ""
 echo -e "${YELLOW}[5/8] Cleaning PostgreSQL...${NC}"
 
 if command -v psql &>/dev/null; then
-    PG_DBS=$(sudo -u postgres psql -t -A -c "SELECT datname FROM pg_database WHERE datname LIKE 'sqli_arena_%';" 2>/dev/null || true)
+    # Use su instead of sudo to avoid use_pty issues when called from web UI
+    PG_DBS=$(su -s /bin/sh postgres -c "psql -t -A -c \"SELECT datname FROM pg_database WHERE datname LIKE 'sqli_arena_%';\"" 2>/dev/null || true)
     if [[ -n "$PG_DBS" ]]; then
         for db in $PG_DBS; do
-            sudo -u postgres psql -c "DROP DATABASE IF EXISTS \"$db\";" 2>/dev/null || true
+            su -s /bin/sh postgres -c "psql -c \"DROP DATABASE IF EXISTS \\\"$db\\\";\"" 2>/dev/null || true
             echo -e "  ${GREEN}[+]${NC} Dropped: $db"
         done
     else
         echo -e "  No sqli_arena_* PostgreSQL databases found."
     fi
 
-    sudo -u postgres psql -c "DROP USER IF EXISTS sqli_arena;" 2>/dev/null || true
+    su -s /bin/sh postgres -c "psql -c \"DROP USER IF EXISTS sqli_arena;\"" 2>/dev/null || true
     echo -e "  ${GREEN}[+]${NC} Removed PostgreSQL user: sqli_arena"
 else
     echo -e "  ${YELLOW}[!]${NC} psql not found, skipping"
@@ -187,18 +188,55 @@ done
 echo ""
 echo -e "${YELLOW}[7/8] Removing web deployment...${NC}"
 
-# Remove webroot
+# Remove hosts entry
+if grep -q "sqli-arena" /etc/hosts 2>/dev/null; then
+    if sed -i '/sqli-arena/d' /etc/hosts 2>/dev/null; then
+        echo -e "  ${GREEN}[+]${NC} Removed $HOSTNAME_ALIAS from /etc/hosts"
+    else
+        echo -e "  ${YELLOW}[!]${NC} Could not modify /etc/hosts (read-only filesystem?)"
+    fi
+fi
+
+# Remove setuid cleanup helper
+if [[ -f /usr/local/bin/sqli-arena-cleanup ]]; then
+    if rm -f /usr/local/bin/sqli-arena-cleanup 2>/dev/null; then
+        echo -e "  ${GREEN}[+]${NC} Removed setuid cleanup helper"
+    else
+        echo -e "  ${YELLOW}[!]${NC} Could not remove /usr/local/bin/sqli-arena-cleanup (read-only filesystem?)"
+    fi
+fi
+
+# Remove sudoers rule
+if [[ -f /etc/sudoers.d/sqli-arena-cleanup ]]; then
+    if rm -f /etc/sudoers.d/sqli-arena-cleanup 2>/dev/null; then
+        echo -e "  ${GREEN}[+]${NC} Removed sudoers rule"
+    else
+        echo -e "  ${YELLOW}[!]${NC} Could not remove sudoers rule (read-only filesystem?)"
+    fi
+fi
+
+# Revert Apache AllowOverride to default
+APACHE_CONF="/etc/apache2/apache2.conf"
+if [[ -f "$APACHE_CONF" ]]; then
+    if grep -A5 '<Directory /var/www/>' "$APACHE_CONF" | grep -q 'AllowOverride All'; then
+        if sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride All/AllowOverride None/' "$APACHE_CONF" 2>/dev/null; then
+            # Do NOT restart Apache here — when called from the web UI, restarting
+            # kills the PHP process before it can send the cleanup response.
+            echo -e "  ${GREEN}[+]${NC} Reverted Apache AllowOverride to None (restart Apache manually to apply)"
+        else
+            echo -e "  ${YELLOW}[!]${NC} Could not modify Apache config (read-only filesystem?)"
+        fi
+    fi
+fi
+
+# Remove webroot LAST — this script lives inside $WEBROOT, so deleting it
+# earlier kills the script mid-execution when called via popen() from the
+# setuid helper binary
 if [[ -d "$WEBROOT" ]]; then
     rm -rf "$WEBROOT"
     echo -e "  ${GREEN}[+]${NC} Removed: $WEBROOT"
 else
     echo -e "  $WEBROOT not found, skipping."
-fi
-
-# Remove hosts entry
-if grep -q "$HOSTNAME_ALIAS" /etc/hosts 2>/dev/null; then
-    sed -i "/$HOSTNAME_ALIAS/d" /etc/hosts
-    echo -e "  ${GREEN}[+]${NC} Removed $HOSTNAME_ALIAS from /etc/hosts"
 fi
 
 # ============================================================

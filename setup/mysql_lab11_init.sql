@@ -1,14 +1,13 @@
 -- =========================
 -- SQLi-Arena: MySQL Lab 11
--- Blind Time: SLEEP() + IF
+-- Blind Time-Based: SLEEP() + IF
 -- =========================
 
-DROP DATABASE IF EXISTS sqli_arena_mysql_lab11;
-CREATE DATABASE sqli_arena_mysql_lab11;
+CREATE DATABASE IF NOT EXISTS sqli_arena_mysql_lab11;
 USE sqli_arena_mysql_lab11;
 
-DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS admin_tokens;
+DROP TABLE IF EXISTS sessions;
 
 CREATE TABLE sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,4 +29,4 @@ INSERT INTO sessions (session_token, user_id, created_at) VALUES
 ('jkl567yza890',  5, '2026-03-23 07:00:00');
 
 INSERT INTO admin_tokens (token) VALUES
-('FLAG{t1m3_b4s3d_sl33p}');
+('FLAG{my_t1m3_sl33p_bl1nd}');

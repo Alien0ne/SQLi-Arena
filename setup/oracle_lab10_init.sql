@@ -1,30 +1,26 @@
--- =========================
--- SQLi-Arena: Oracle Lab 10
--- OOB -- HTTPURITYPE / XXE
--- =========================
--- Run as SYSDBA:
--- CREATE USER sqli_arena_oracle_lab10 IDENTIFIED BY sqli_arena_2026;
--- GRANT CONNECT, RESOURCE TO sqli_arena_oracle_lab10;
--- GRANT EXECUTE ON HTTPURITYPE TO sqli_arena_oracle_lab10;
--- Connect as lab user:
+-- Oracle Lab 10: Out-of-Band HTTPURITYPE / XXE
+-- Tables: orders (id, product, total_price, status, customer), internal_flags (id, flag)
 
 CREATE TABLE orders (
     id          NUMBER PRIMARY KEY,
-    customer    VARCHAR2(100) NOT NULL,
-    product     VARCHAR2(100) NOT NULL,
-    total_price NUMBER(10,2)  NOT NULL,
-    status      VARCHAR2(30)  NOT NULL
+    product     VARCHAR2(200),
+    total_price NUMBER(10,2),
+    status      VARCHAR2(50),
+    customer    VARCHAR2(200)
 );
 
-INSERT INTO orders VALUES (1, 'John Doe',     'Laptop Pro',       1299.99, 'shipped');
-INSERT INTO orders VALUES (2, 'Jane Smith',   'Wireless Headset',  149.99, 'processing');
-INSERT INTO orders VALUES (3, 'Bob Wilson',   'USB-C Dock',        79.99,  'delivered');
-INSERT INTO orders VALUES (4, 'Alice Brown',  'Monitor 27in',     349.99,  'shipped');
+INSERT INTO orders (id, product, total_price, status, customer) VALUES (1, 'Laptop Pro 15', 1299.99, 'shipped', 'John Doe');
+INSERT INTO orders (id, product, total_price, status, customer) VALUES (2, 'Wireless Earbuds', 79.99, 'delivered', 'John Doe');
+INSERT INTO orders (id, product, total_price, status, customer) VALUES (3, 'Standing Desk', 499.00, 'processing', 'Jane Smith');
+INSERT INTO orders (id, product, total_price, status, customer) VALUES (4, 'Monitor 27 4K', 349.99, 'shipped', 'Alice Brown');
+INSERT INTO orders (id, product, total_price, status, customer) VALUES (5, 'Keyboard Case', 45.00, 'delivered', 'Bob Wilson');
 
 CREATE TABLE internal_flags (
     id   NUMBER PRIMARY KEY,
-    flag VARCHAR2(100) NOT NULL
+    flag VARCHAR2(200)
 );
 
-INSERT INTO internal_flags VALUES (1, 'FLAG{or_httpur1typ3_xx3}');
+INSERT INTO internal_flags (id, flag) VALUES (1, 'FLAG{or_httpur1typ3_xx3}');
+
 COMMIT;
+EXIT;

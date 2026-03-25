@@ -42,6 +42,17 @@ for i in $(seq 1 60); do
     sleep 2
 done
 
+# Wait for MSSQL Internal (Server B for lab 13 linked server)
+echo "[*] Waiting for MSSQL Internal (Server B) to be ready..."
+for i in $(seq 1 60); do
+    if docker exec sqli-arena-mssql-internal /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Internal2026!" -C -Q "SELECT 1" -b &>/dev/null; then
+        echo "[+] MSSQL Internal is ready!"
+        break
+    fi
+    [ $i -eq 60 ] && echo "[-] MSSQL Internal timeout" && exit 1
+    sleep 2
+done
+
 # Wait for Oracle
 echo "[*] Waiting for Oracle to be ready..."
 for i in $(seq 1 90); do
@@ -77,12 +88,13 @@ done
 
 echo ""
 echo "[+] All containers are running!"
-echo "    MongoDB:  localhost:27017"
-echo "    Redis:    localhost:6379"
-echo "    MSSQL:    localhost:1433"
-echo "    Oracle:   localhost:1521"
-echo "    HQL API:  localhost:8081"
-echo "    GraphQL:  localhost:4000"
+echo "    MongoDB:        localhost:27017"
+echo "    Redis:          localhost:6379"
+echo "    MSSQL (A):      localhost:1433"
+echo "    MSSQL (B):      localhost:1434  (internal server for linked server lab)"
+echo "    Oracle:         localhost:1521"
+echo "    HQL API:        localhost:8081"
+echo "    GraphQL:        localhost:4000"
 echo ""
 echo "[*] Next steps:"
 echo "    If running standalone, initialize lab databases:"

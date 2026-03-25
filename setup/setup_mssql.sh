@@ -7,7 +7,21 @@ SA_PASS="SqliArena2026!"
 CONTAINER="sqli-arena-mssql"
 SQLCMD="/opt/mssql-tools18/bin/sqlcmd"
 
+INTERNAL_CONTAINER="sqli-arena-mssql-internal"
+INTERNAL_SA_PASS="Internal2026!"
+
 echo "[*] Setting up MSSQL lab databases..."
+
+# ---- Initialize Server B (internal) first so linked server can connect ----
+echo "[*] Initializing MSSQL Internal Server (Server B) for lab 13..."
+INTERNAL_INIT="$SCRIPT_DIR/mssql_internal_init.sql"
+if [ -f "$INTERNAL_INIT" ]; then
+    docker cp "$INTERNAL_INIT" $INTERNAL_CONTAINER:/tmp/internal_init.sql
+    docker exec $INTERNAL_CONTAINER $SQLCMD -S localhost -U sa -P "$INTERNAL_SA_PASS" -C -i /tmp/internal_init.sql -b 2>&1 | grep -v "^$" || true
+    echo "[+] Server B (internal) initialized."
+else
+    echo "[-] Warning: $INTERNAL_INIT not found, skipping internal server setup"
+fi
 
 # Create the sqli_arena login and user
 echo "[*] Creating sqli_arena login with sysadmin role..."
@@ -37,15 +51,7 @@ for i in $(seq 1 18); do
         ALTER ROLE db_owner ADD MEMBER sqli_arena;
         " -b 2>&1 | grep -v "^$" || true
 
-        # Lab 13: also grant access to the internal_db (linked server pivot target)
-        if [ "$i" -eq 13 ]; then
-            docker exec $CONTAINER $SQLCMD -S localhost -U sa -P "$SA_PASS" -C -Q "
-            USE [sqli_arena_internal_db];
-            IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'sqli_arena')
-                CREATE USER sqli_arena FOR LOGIN sqli_arena;
-            ALTER ROLE db_owner ADD MEMBER sqli_arena;
-            " -b 2>&1 | grep -v "^$" || true
-        fi
+        # Lab 13: internal_db is on Server B (mssql-internal), no local grant needed
     else
         echo "[-] Warning: $INIT_FILE not found, skipping lab $i"
     fi

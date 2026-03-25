@@ -3,8 +3,7 @@
 -- Window Functions for Extraction
 -- ================================
 
-DROP DATABASE IF EXISTS sqli_arena_mariadb_lab8;
-CREATE DATABASE sqli_arena_mariadb_lab8;
+CREATE DATABASE IF NOT EXISTS sqli_arena_mariadb_lab8;
 USE sqli_arena_mariadb_lab8;
 
 DROP TABLE IF EXISTS scores;
@@ -26,10 +25,7 @@ INSERT INTO scores (player, score) VALUES
 ('CyberNinja', 8700),
 ('PixelWitch', 9200),
 ('NeonSamurai', 8100),
-('GhostRunner', 9800),
-('ByteKnight', 7600),
-('VoidWalker', 8900),
-('QuantumFox', 9100);
+('GhostRunner', 9800);
 
 INSERT INTO window_flags (flag_value) VALUES
-('FLAG{ma_w1nd0w_func_3xtr4ct}');
+('FLAG{ma_w1nd0w_func_r4nk}');

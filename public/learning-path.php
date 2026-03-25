@@ -267,7 +267,7 @@ if ($activePhase) {
         <div class="lp-labs" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;">
             <?php foreach ($phaseLabs as $pl):
                 $solved = isLabSolved($pl['engine'], $pl['num']);
-                $href = url_lab($pl['engine'], $pl['num']) . '?ref=' . urlencode($currentPhase['id']);
+                $href = url_lab($pl['engine'], $pl['num'], 'black', $currentPhase['id']);
             ?>
                 <a href="<?= $href ?>" class="lp-lab <?= $solved ? 'lp-lab--solved' : '' ?>" style="--lab-color: var(--<?= $pl['engine_color'] ?>);">
                     <div class="lp-lab-top">

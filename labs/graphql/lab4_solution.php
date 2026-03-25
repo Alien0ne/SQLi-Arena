@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     GraphQL batching allows sending multiple operations in a single HTTP request. In this lab,
     the server maintains a shared authentication context across operations within a batch.

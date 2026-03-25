@@ -1,27 +1,28 @@
--- =========================
--- SQLi-Arena: PostgreSQL Lab 9
--- RCE -- COPY TO PROGRAM
--- =========================
+-- Lab 9: RCE - COPY TO PROGRAM
 DROP DATABASE IF EXISTS sqli_arena_pgsql_lab9;
-CREATE DATABASE sqli_arena_pgsql_lab9;
+CREATE DATABASE sqli_arena_pgsql_lab9 OWNER sqli_arena;
 \c sqli_arena_pgsql_lab9
 
 CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
-    filename VARCHAR(200) NOT NULL,
+    filename TEXT NOT NULL,
     content TEXT NOT NULL
 );
 
+INSERT INTO documents (filename, content) VALUES
+('quarterly_report_q3.pdf', 'Revenue summary and projections for Q3 2025.'),
+('annual_report_2024.pdf', 'Full year financial statements and audit notes.'),
+('incident_report_jan.docx', 'Security incident post-mortem from January.'),
+('server_inventory.xlsx', 'Hardware inventory across all data centers.'),
+('deployment_guide.md', 'Step-by-step production deployment instructions.');
+
 CREATE TABLE admin_secrets (
     id SERIAL PRIMARY KEY,
-    secret_value VARCHAR(200) NOT NULL
+    secret_value TEXT NOT NULL
 );
 
-INSERT INTO documents (filename, content) VALUES
-('report_q1.pdf', 'Quarterly financial report for Q1 2026.'),
-('employee_list.csv', 'Name, Department, Role -- exported from HR system.'),
-('server_config.txt', 'PostgreSQL 16.2 running on Ubuntu 22.04 LTS.'),
-('backup_log.txt', 'Last full backup completed at 2026-03-22 03:00 UTC.');
-
 INSERT INTO admin_secrets (secret_value) VALUES
-('FLAG{pg_c0py_t0_pr0gr4m_rc3}');
+('FLAG{pg_c0py_t0_pr0gr4m}');
+
+GRANT ALL ON ALL TABLES IN SCHEMA public TO sqli_arena;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO sqli_arena;

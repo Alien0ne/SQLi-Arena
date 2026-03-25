@@ -26,5 +26,5 @@ try {
     }
 } catch (PDOException $e) {
     // VULNERABLE: Raw error message exposed to user
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

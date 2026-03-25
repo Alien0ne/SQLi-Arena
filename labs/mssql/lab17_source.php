@@ -10,7 +10,7 @@
 require_once __DIR__ . '/../../includes/db.php';
 
 // Get user input
-$q = $_GET['q'];
+$q = $_GET['q'] ?? '';
 
 // WAF: Block common SQL keywords
 $blocked = ['union', 'select', 'convert', 'cast', 'exec', "'"];
@@ -38,5 +38,5 @@ try {
         echo "Product: {$row['name']} | Price: {$row['price']}";
     }
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

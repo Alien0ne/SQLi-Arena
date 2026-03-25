@@ -1,18 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 3: Blind Extraction via $regex
- * Difficulty: Medium
- *
- * Vulnerability: The $regex operator allows pattern matching against fields.
- * By iterating through characters (^F, ^FL, ^FLA...), the attacker can extract
- * the password character by character based on login success/failure responses.
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName
- * provided by includes/db.php). Collection: lab3_users
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -20,15 +10,14 @@ $logged_in_user = null;
 $query_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_r3g3x_bl1nd_3xtr4ct}') {
         $_SESSION['mongodb_lab3_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab3", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab3", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -73,7 +62,7 @@ if (isset($_POST['login_submit'])) {
 
     <h4>Scenario</h4>
     <p>
-        This login portal is vulnerable to NoSQL operator injection, but unlike Labs 1 and 2,
+        A login portal is vulnerable to NoSQL operator injection, but unlike Labs 1 and 2,
         it does <strong>not</strong> display the admin's password upon successful login. You only
         see "Login successful!" or "Invalid credentials.": a classic blind scenario.
     </p>
@@ -95,13 +84,17 @@ if (isset($_POST['login_submit'])) {
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

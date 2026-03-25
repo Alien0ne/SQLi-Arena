@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT password FROM users WHERE username = 'admin' LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['password']) {
         $_SESSION['pgsql_lab1_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab1", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab1", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,13 +24,16 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This application lets you look up user profiles by username. The query directly concatenates your
-        input into the SQL statement without sanitization. Your goal is to use a UNION-based injection to
-        extract the admin password from the <code>users</code> table.
+        A web application lets you look up user profiles by username. The query directly concatenates
+        your input into the SQL statement without sanitization. The admin account is hidden from
+        normal lookups.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong> The <code>||</code> operator for string concatenation,
-    <code>--</code> for line comments, and strict column-type matching in UNION queries.</p>
-    <p><strong>Table Schema:</strong> <code>users(id serial, username varchar, password varchar, email varchar)</code></p>
+
+    <h4>Objective</h4>
+    <p>
+        Use a UNION-based SQL injection to extract the <strong>admin password</strong> from the
+        <code>users</code> table and submit it below.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint1">&#128161; Click for hints</span>
@@ -45,9 +48,9 @@ if (isset($_POST['flag_input'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Admin Password</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the admin password..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -83,7 +86,7 @@ if (isset($_POST['username'])) {
     $input = $_POST['username'];
     $query = "SELECT id, username, email FROM users WHERE username = '$input'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

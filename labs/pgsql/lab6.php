@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT flag_text FROM flag_store LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['flag_text']) {
         $_SESSION['pgsql_lab6_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab6", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab6", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,19 +24,16 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This note-taking application lets you search through your notes. PostgreSQL natively supports
-        executing multiple SQL statements separated by semicolons (<code>;</code>). PHP's <code>pg_query()</code>
-        also allows this by default. Your goal is to use stacked queries to move the flag from a hidden
-        table into visible note data.
+        A note-taking application lets you search through your notes. PostgreSQL natively supports
+        executing multiple SQL statements separated by semicolons (<code>;</code>), and PHP's
+        <code>pg_query()</code> allows this by default.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong> Stacked queries with <code>;</code> for multi-statement
-    execution, <code>UPDATE</code>/<code>INSERT</code> via injection, <code>pg_query()</code> supports
-    multiple statements natively.</p>
-    <p><strong>Table Schemas:</strong></p>
-    <ul>
-        <li><code>notes(id serial, title varchar, content text)</code></li>
-        <li><code>flag_store(id serial, flag_text varchar)</code>: hidden table containing the flag</li>
-    </ul>
+
+    <h4>Objective</h4>
+    <p>
+        Use stacked queries to move the <strong>flag</strong> from the hidden <code>flag_store</code>
+        table into the visible <code>notes</code> table, then retrieve it.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint6">&#128161; Click for hints</span>
@@ -53,7 +50,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the flag..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -90,7 +87,7 @@ if (isset($_POST['search'])) {
 
     $query = "SELECT id, title, content FROM notes WHERE title ILIKE '%$input%'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

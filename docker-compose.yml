@@ -6,12 +6,30 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "SqliArena2026!"
     ports:
-      - "1433:1433"
+      - "127.0.0.1:1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
     restart: unless-stopped
     healthcheck:
       test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "SqliArena2026!" -C -Q "SELECT 1" -b -o /dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  mssql-internal:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqli-arena-mssql-internal
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Internal2026!"
+    ports:
+      - "127.0.0.1:1434:1433"
+    volumes:
+      - mssql-internal-data:/var/opt/mssql
+    restart: unless-stopped
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Internal2026!" -C -Q "SELECT 1" -b -o /dev/null
       interval: 10s
       timeout: 5s
       retries: 10
@@ -23,7 +41,7 @@ services:
     environment:
       ORACLE_PASSWORD: "SqliArena2026"
     ports:
-      - "1521:1521"
+      - "127.0.0.1:1521:1521"
     volumes:
       - oracle-data:/opt/oracle/oradata
     restart: unless-stopped
@@ -38,7 +56,7 @@ services:
     image: mongo:7
     container_name: sqli-arena-mongodb
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: sqli_arena
       MONGO_INITDB_ROOT_PASSWORD: sqli_arena_2026
@@ -57,7 +75,7 @@ services:
     container_name: sqli-arena-redis
     command: redis-server --requirepass sqli_arena_2026
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
     restart: unless-stopped
@@ -74,7 +92,7 @@ services:
       dockerfile: Dockerfile
     container_name: sqli-arena-hql
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     restart: unless-stopped
     healthcheck:
       test: wget -q --spider http://localhost:8080/actuator/health || exit 1
@@ -89,7 +107,7 @@ services:
       dockerfile: Dockerfile
     container_name: sqli-arena-graphql
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
     restart: unless-stopped
     healthcheck:
       test: wget -q --spider http://127.0.0.1:4000/health || exit 1
@@ -100,6 +118,7 @@ services:
 
 volumes:
   mssql-data:
+  mssql-internal-data:
   oracle-data:
   mongodb-data:
   redis-data:

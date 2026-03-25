@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     HQL is translated to native SQL before execution. When user input is concatenated
     into HQL queries and the application falls back to native SQL mode, UNION-based injection

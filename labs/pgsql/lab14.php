@@ -7,15 +7,15 @@ $verify_error = null;
 /* =====================
    FLAG VERIFY
 ===================== */
-if (isset($_POST['flag_field'])) {
-    $submitted = $_POST['flag_field'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = pg_query($conn, "SELECT secret_value FROM restricted_data LIMIT 1");
     $row = pg_fetch_assoc($res);
 
     if ($row && $submitted === $row['secret_value']) {
         $_SESSION['pgsql_lab14_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab14", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab14", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -60,9 +60,9 @@ if (isset($_POST['flag_field'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Restricted Data</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_field" class="input" placeholder="Enter the secret value..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -101,7 +101,7 @@ if (isset($_POST['action'])) {
     $query = "SELECT id, action, details, log_time FROM admin_logs WHERE action = '$action'";
 
     // Show the executed query
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

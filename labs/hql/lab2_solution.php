@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     In Hibernate, every entity inherits <code>.class</code> from <code>java.lang.Object</code>.
     When the SELECT field list is user-controlled, accessing <code>class.name</code>,

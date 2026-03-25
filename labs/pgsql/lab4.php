@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT secret_value FROM secrets LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['secret_value']) {
         $_SESSION['pgsql_lab4_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab4", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab4", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,17 +24,15 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This member status checker returns only two possible responses: <strong>"Active"</strong> or
-        <strong>"Not found"</strong>. No data, no errors. You must use the true/false response as a
-        boolean oracle to extract the secret flag character by character using <code>SUBSTRING()</code>.
+        A member status checker returns only two possible responses: <strong>"Active"</strong> or
+        <strong>"Not found"</strong>. No data is displayed, and no errors are shown.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong> <code>SUBSTRING(string, position, length)</code> for
-    character extraction, boolean-based blind injection using conditional responses.</p>
-    <p><strong>Table Schemas:</strong></p>
-    <ul>
-        <li><code>members(id serial, username varchar, is_active boolean)</code></li>
-        <li><code>secrets(id serial, secret_value varchar)</code></li>
-    </ul>
+
+    <h4>Objective</h4>
+    <p>
+        Use the true/false response as a boolean oracle to extract the <strong>secret value</strong>
+        from the <code>secrets</code> table character by character using <code>SUBSTRING()</code>.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint4">&#128161; Click for hints</span>
@@ -49,9 +47,9 @@ if (isset($_POST['flag_input'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Secret Value</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the secret value..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -88,7 +86,7 @@ if (isset($_POST['member'])) {
 
     $query = "SELECT username, is_active FROM members WHERE username = '$input' AND is_active = true";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

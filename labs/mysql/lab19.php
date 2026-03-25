@@ -7,8 +7,8 @@ $verify_error = null;
 /* =====================
    FLAG VERIFY
 ===================== */
-if (isset($_POST['flag_value'])) {
-    $submitted = $_POST['flag_value'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['flag_value'])) {
 
     if ($row && $submitted === $row['flag_value']) {
         $_SESSION['mysql_lab19_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab19", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab19", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -70,7 +70,7 @@ if (isset($_POST['flag_value'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_value" class="input" placeholder="Enter the flag value..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -127,7 +127,7 @@ if (isset($_POST['username']) && $_POST['username'] !== '') {
     $query = "SELECT username, role FROM users WHERE username = '$filtered'";
 
     // Show the executed query
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

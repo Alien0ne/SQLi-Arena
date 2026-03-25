@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_j4v4_st0r3d_rc3}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT flag FROM rce_flags WHERE id=1";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['FLAG']) {
         $_SESSION['oracle_lab12_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab12", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab12", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,18 +27,10 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This server monitoring dashboard queries an Oracle database. Oracle ships with a built-in
-        JVM (Java Virtual Machine). If an attacker can create a Java stored procedure (via
-        stacked queries or existing privileges), they can execute <code>Runtime.exec()</code>
-        to run arbitrary OS commands on the database server.
+        A server monitoring dashboard queries an Oracle database. Oracle ships with a built-in
+        JVM (Java Virtual Machine). If an attacker can create a Java stored procedure, they can
+        execute <code>Runtime.exec()</code> to run arbitrary OS commands on the database server.
     </p>
-    <p><strong>Oracle Concepts:</strong> Oracle's embedded JVM allows Java classes to be loaded
-    as stored procedures. <code>Runtime.getRuntime().exec("cmd")</code> provides OS command
-    execution. Requires <code>CREATE PROCEDURE</code> and <code>JAVAUSERPRIV</code> privileges.</p>
-    <p><strong>Table Schema:</strong> <code>servers(id NUMBER, hostname VARCHAR2, ip_addr VARCHAR2, status VARCHAR2)</code></p>
-    <p><strong>Hidden Table:</strong> <code>rce_flags(id NUMBER, flag VARCHAR2)</code></p>
-    <p><em>Note: For this lab, use UNION-based extraction to retrieve the flag.
-    The solution explains the Java RCE technique conceptually.</em></p>
 
     <h4>Objective</h4>
     <p>
@@ -62,7 +52,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -98,7 +88,7 @@ if (isset($_POST['status'])) {
     $input = $_POST['status'];
     $query = "SELECT id, hostname, ip_addr, status FROM servers WHERE status = '$input'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -136,8 +126,8 @@ if (isset($_POST['status'])) {
         }
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

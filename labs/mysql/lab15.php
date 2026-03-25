@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   PROMO CODE VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['promo_code'])) {
-    $submitted = $_POST['promo_code'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['promo_code'])) {
 
     if ($row && $submitted === $row['code']) {
         $_SESSION['mysql_lab15_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab15", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab15", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -63,9 +63,9 @@ if (isset($_POST['promo_code'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Promo Code</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="promo_code" class="input" placeholder="Enter the promo code..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -110,7 +110,7 @@ $sort = $_POST['sort'] ?? 'id';
 $query = "SELECT id, name, price, category, rating FROM products ORDER BY $sort";
 
 // Show the executed query in a terminal block
-echo '<div class="terminal">';
+echo '<div class="terminal query-output">';
 echo '  <div class="terminal-header">';
 echo '    <span class="terminal-dot red"></span>';
 echo '    <span class="terminal-dot yellow"></span>';

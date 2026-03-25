@@ -11,13 +11,15 @@ CREATE DATABASE sqli_arena_mssql_lab5;
 GO
 USE sqli_arena_mssql_lab5;
 GO
+
 CREATE TABLE audit_log (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    event VARCHAR(200) NOT NULL,
+    event NVARCHAR(200) NOT NULL,
     timestamp DATETIME DEFAULT GETDATE(),
     user_id INT
 );
 GO
+
 INSERT INTO audit_log (event, user_id) VALUES
 ('User login successful', 1),
 ('User login failed', 2),
@@ -33,8 +35,9 @@ GO
 
 CREATE TABLE secrets (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    secret VARCHAR(100) NOT NULL
+    secret NVARCHAR(100) NOT NULL
 );
 GO
+
 INSERT INTO secrets (secret) VALUES ('FLAG{ms_w41tf0r_d3l4y_bl1nd}');
 GO

@@ -1,21 +1,17 @@
--- =========================
--- SQLi-Arena: Oracle Lab 4
--- Error -- UTL_INADDR
--- =========================
--- Run as SYSDBA:
--- CREATE USER sqli_arena_oracle_lab4 IDENTIFIED BY sqli_arena_2026;
--- GRANT CONNECT, RESOURCE TO sqli_arena_oracle_lab4;
--- GRANT EXECUTE ON UTL_INADDR TO sqli_arena_oracle_lab4;
--- Connect as lab user:
+-- Oracle Lab 4: Error-Based UTL_INADDR
+-- Tables: users (id, username, email, password)
 
 CREATE TABLE users (
-    id        NUMBER PRIMARY KEY,
-    username  VARCHAR2(50)  NOT NULL,
-    password  VARCHAR2(100) NOT NULL,
-    email     VARCHAR2(150) NOT NULL
+    id       NUMBER PRIMARY KEY,
+    username VARCHAR2(100) NOT NULL,
+    email    VARCHAR2(200),
+    password VARCHAR2(200)
 );
 
-INSERT INTO users VALUES (1, 'admin',   'FLAG{or_utl_1n4ddr_3rr0r}', 'admin@sqli-arena.local');
-INSERT INTO users VALUES (2, 'jdoe',    'jd0e_s3cur3!',              'jdoe@sqli-arena.local');
-INSERT INTO users VALUES (3, 'analyst', 'an4lyst_2026',              'analyst@sqli-arena.local');
+INSERT INTO users (id, username, email, password) VALUES (1, 'admin', 'admin@corp.local', 'FLAG{or_utl_1n4ddr_3rr0r}');
+INSERT INTO users (id, username, email, password) VALUES (2, 'jsmith', 'jsmith@corp.local', 'smith2024!');
+INSERT INTO users (id, username, email, password) VALUES (3, 'mary', 'mary@corp.local', 'm4ryP@ss');
+INSERT INTO users (id, username, email, password) VALUES (4, 'devuser', 'devuser@corp.local', 'd3v_s3cur3');
+
 COMMIT;
+EXIT;

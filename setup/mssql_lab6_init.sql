@@ -11,12 +11,14 @@ CREATE DATABASE sqli_arena_mssql_lab6;
 GO
 USE sqli_arena_mssql_lab6;
 GO
+
 CREATE TABLE notes (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    title VARCHAR(100) NOT NULL,
-    content VARCHAR(500) NOT NULL
+    title NVARCHAR(100) NOT NULL,
+    content NVARCHAR(500) NOT NULL
 );
 GO
+
 INSERT INTO notes (title, content) VALUES
 ('Meeting Notes',     'Discuss Q3 roadmap with engineering team'),
 ('Todo List',         'Fix bug #4521, deploy hotfix, update docs'),
@@ -27,8 +29,9 @@ GO
 
 CREATE TABLE flags (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    flag VARCHAR(100) NOT NULL
+    flag NVARCHAR(100) NOT NULL
 );
 GO
-INSERT INTO flags (flag) VALUES ('FLAG{ms_st4ck3d_full_ctrl}');
+
+INSERT INTO flags (flag) VALUES ('FLAG{ms_st4ck3d_upd4t3}');
 GO

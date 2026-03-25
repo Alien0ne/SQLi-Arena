@@ -24,5 +24,5 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     echo "Saved: #{$row['id']} by {$row['author']}: {$row['comment']}";
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

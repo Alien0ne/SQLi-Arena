@@ -1,20 +1,18 @@
--- =========================
--- SQLi-Arena: Oracle Lab 3
--- Error -- XMLType()
--- =========================
--- Run as SYSDBA:
--- CREATE USER sqli_arena_oracle_lab3 IDENTIFIED BY sqli_arena_2026;
--- GRANT CONNECT, RESOURCE TO sqli_arena_oracle_lab3;
--- Connect as lab user:
+-- Oracle Lab 3: Error-Based XMLType()
+-- Tables: users (id, username, password, role)
 
 CREATE TABLE users (
-    id        NUMBER PRIMARY KEY,
-    username  VARCHAR2(50)  NOT NULL,
-    password  VARCHAR2(100) NOT NULL,
-    role      VARCHAR2(30)  NOT NULL
+    id       NUMBER PRIMARY KEY,
+    username VARCHAR2(100) NOT NULL,
+    password VARCHAR2(200),
+    role     VARCHAR2(50)
 );
 
-INSERT INTO users VALUES (1, 'admin',   'FLAG{or_xmltyp3_3rr0r}', 'administrator');
-INSERT INTO users VALUES (2, 'editor',  'ed1t0r_p@ss',            'editor');
-INSERT INTO users VALUES (3, 'viewer',  'v13w_0nly!',             'viewer');
+INSERT INTO users (id, username, password, role) VALUES (1, 'admin', 'FLAG{or_xmltyp3_3rr0r}', 'administrator');
+INSERT INTO users (id, username, password, role) VALUES (2, 'jdoe', 'welcome123', 'user');
+INSERT INTO users (id, username, password, role) VALUES (3, 'alice', 'alice2024!', 'user');
+INSERT INTO users (id, username, password, role) VALUES (4, 'manager', 'mgr_s3cure', 'manager');
+INSERT INTO users (id, username, password, role) VALUES (5, 'guest', 'guest', 'guest');
+
 COMMIT;
+EXIT;

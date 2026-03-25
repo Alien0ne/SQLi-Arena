@@ -4,41 +4,61 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/reset_functions.php';
 
 // Handle reset all databases POST (form submit)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_all'])) {
-    $engines = ['mysql' => 20, 'pgsql' => 15, 'sqlite' => 10, 'mariadb' => 8,
-                'mssql' => 18, 'oracle' => 14, 'mongodb' => 8, 'redis' => 5, 'hql' => 5, 'graphql' => 5];
-    foreach ($engines as $engine => $count) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_all']) && csrf_verify()) {
+    foreach (LAB_COUNTS as $engine => $count) {
         resetEngineDatabase($engine);
     }
     header("Location: " . url_page('control-panel') . "?reset=success");
     exit;
 }
 
-// Handle cleanup (drop all databases) POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cleanup_action'] ?? '') === 'drop_all_databases') {
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-    $conn = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASS);
-    $dropped = []; $errors = [];
-    $result = mysqli_query($conn, "SHOW DATABASES LIKE 'sqli_arena_%'");
-    while ($row = mysqli_fetch_row($result)) {
-        $dbName = $row[0];
-        try {
-            mysqli_query($conn, "DROP DATABASE `" . mysqli_real_escape_string($conn, $dbName) . "`");
-            $dropped[] = $dbName;
-        } catch (Exception $e) {
-            $errors[] = "$dbName: " . $e->getMessage();
-        }
+// Handle full cleanup POST — delegates to cleanup.sh via sudo for full privileges
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cleanup_action'] ?? '') === 'full_cleanup' && csrf_verify()) {
+    // Cleanup can take a while (Docker, multiple DB engines) — extend timeout
+    set_time_limit(300);
+
+    // Clear session progress first (PHP can do this itself)
+    session_unset();
+    session_destroy();
+
+    // Run the cleanup via setuid helper binary (avoids sudo-from-Apache issues)
+    $output = [];
+    $rc = 1;
+    $helper = '/usr/local/bin/sqli-arena-cleanup';
+
+    if (is_file($helper)) {
+        exec($helper . " 2>&1", $output, $rc);
     }
-    foreach ($_SESSION as $k => $v) {
-        if (str_ends_with($k, '_solved')) unset($_SESSION[$k]);
+
+    $log = implode("\n", $output);
+    $success = ($rc === 0 || strpos($log, 'Cleanup Complete') !== false);
+
+    // Count what was done from the output
+    $removedCount = substr_count($log, '[+]');
+
+    // Send standalone response since the web root is now deleted
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html><head><title>SQLi-Arena — Cleanup Complete</title>';
+    echo '<style>body{background:#0a0e17;color:#c8ccd4;font-family:monospace;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;}';
+    echo '.box{background:#12162a;border:1px solid rgba(0,255,157,0.2);border-radius:12px;padding:40px;max-width:600px;text-align:center;}';
+    echo 'h2{color:#00ff9d;margin-bottom:16px;}p{line-height:1.6;font-size:14px;}';
+    echo '.stat{color:#ff6b6b;font-weight:bold;}.ok{color:#00ff9d;}';
+    echo 'code{background:#1a1f36;padding:6px 12px;border-radius:6px;display:inline-block;margin-top:12px;color:#60a5fa;}';
+    echo 'pre{background:#1a1f36;padding:16px;border-radius:8px;text-align:left;font-size:11px;max-height:300px;overflow-y:auto;margin-top:16px;color:#8b949e;white-space:pre-wrap;}</style></head>';
+    echo '<body><div class="box">';
+    if ($success) {
+        echo '<h2>// cleanup complete</h2>';
+        echo '<p><span class="ok">' . $removedCount . '</span> item(s) removed.</p>';
+        echo '<p>All databases dropped, Docker containers removed, web deployment deleted, session cleared.</p>';
+    } else {
+        echo '<h2 style="color:#ff6b6b;">// cleanup encountered errors</h2>';
+        echo '<p>The cleanup script exited with errors. Some resources may not have been fully removed.</p>';
     }
-    $sqliteDir = SQLITE_DIR;
-    if (is_dir($sqliteDir)) {
-        foreach (glob("$sqliteDir/*.db") ?: [] as $f) { unlink($f); $dropped[] = "sqlite:" . basename($f); }
-    }
-    $count = count($dropped); $errCount = count($errors);
-    $status = $errCount > 0 ? 'partial' : 'success';
-    header("Location: " . url_page('control-panel') . "?cleanup=$status&dropped=$count&errors=$errCount");
+    echo '<p style="margin-top:20px;">To reinstall:</p>';
+    echo '<code>cd ~/SQLi-Arena && sudo bash install.sh</code>';
+    echo '<details style="margin-top:16px;text-align:left;"><summary style="cursor:pointer;color:#60a5fa;">Show cleanup log</summary>';
+    echo '<pre>' . htmlspecialchars($log) . '</pre></details>';
+    echo '</div></body></html>';
     exit;
 }
 
@@ -141,44 +161,44 @@ function getEngineStatuses() {
     // MySQL
     try {
         $c = @mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASS, DB_PREFIX_MYSQL . '1');
-        $engines['mysql'] = ['status' => $c ? 'online' : 'offline', 'labs' => 20, 'type' => 'native'];
+        $engines['mysql'] = ['status' => $c ? 'online' : 'offline', 'labs' => LAB_COUNTS['mysql'], 'type' => 'native'];
         if ($c) mysqli_close($c);
-    } catch (Exception $e) { $engines['mysql'] = ['status' => 'offline', 'labs' => 20, 'type' => 'native']; }
+    } catch (Exception $e) { $engines['mysql'] = ['status' => 'offline', 'labs' => LAB_COUNTS['mysql'], 'type' => 'native']; }
 
     // PostgreSQL
     $c = @pg_connect(sprintf("host=%s port=%d dbname=%s user=%s password=%s connect_timeout=2",
         PGSQL_HOST, PGSQL_PORT, DB_PREFIX_PGSQL . '1', PGSQL_USER, PGSQL_PASS));
-    $engines['pgsql'] = ['status' => $c ? 'online' : 'offline', 'labs' => 15, 'type' => 'native'];
+    $engines['pgsql'] = ['status' => $c ? 'online' : 'offline', 'labs' => LAB_COUNTS['pgsql'], 'type' => 'native'];
     if ($c) pg_close($c);
 
     // SQLite
-    $engines['sqlite'] = ['status' => file_exists(SQLITE_DIR . '/lab1.db') ? 'online' : 'offline', 'labs' => 10, 'type' => 'native'];
+    $engines['sqlite'] = ['status' => file_exists(SQLITE_DIR . '/lab1.db') ? 'online' : 'offline', 'labs' => LAB_COUNTS['sqlite'], 'type' => 'native'];
 
     // MariaDB
     try {
         $c = @mysqli_connect(MARIADB_HOST, MARIADB_USER, MARIADB_PASS, DB_PREFIX_MARIADB . '1');
-        $engines['mariadb'] = ['status' => $c ? 'online' : 'offline', 'labs' => 8, 'type' => 'native'];
+        $engines['mariadb'] = ['status' => $c ? 'online' : 'offline', 'labs' => LAB_COUNTS['mariadb'], 'type' => 'native'];
         if ($c) mysqli_close($c);
-    } catch (Exception $e) { $engines['mariadb'] = ['status' => 'offline', 'labs' => 8, 'type' => 'native']; }
+    } catch (Exception $e) { $engines['mariadb'] = ['status' => 'offline', 'labs' => LAB_COUNTS['mariadb'], 'type' => 'native']; }
 
     // MSSQL
     try {
         if (class_exists('PDO') && in_array('sqlsrv', PDO::getAvailableDrivers())) {
             $c = @new PDO("sqlsrv:Server=localhost;Database=sqli_arena_mssql_lab1;TrustServerCertificate=1;LoginTimeout=2", 'sqli_arena', 'sqli_arena_2026');
-            $engines['mssql'] = ['status' => 'online', 'labs' => 18, 'type' => 'docker'];
+            $engines['mssql'] = ['status' => 'online', 'labs' => LAB_COUNTS['mssql'], 'type' => 'docker'];
         } else {
-            $engines['mssql'] = ['status' => 'no_driver', 'labs' => 18, 'type' => 'docker'];
+            $engines['mssql'] = ['status' => 'no_driver', 'labs' => LAB_COUNTS['mssql'], 'type' => 'docker'];
         }
-    } catch (Exception $e) { $engines['mssql'] = ['status' => 'offline', 'labs' => 18, 'type' => 'docker']; }
+    } catch (Exception $e) { $engines['mssql'] = ['status' => 'offline', 'labs' => LAB_COUNTS['mssql'], 'type' => 'docker']; }
 
     // Oracle
     if (function_exists('oci_connect')) {
         $oraConn = sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=%d))(CONNECT_DATA=(SID=%s)))", ORACLE_HOST, ORACLE_PORT, ORACLE_SID);
         $c = @oci_connect(ORACLE_USER_PREFIX . '1', ORACLE_PASS, $oraConn);
-        $engines['oracle'] = ['status' => $c ? 'online' : 'offline', 'labs' => 14, 'type' => 'docker'];
+        $engines['oracle'] = ['status' => $c ? 'online' : 'offline', 'labs' => LAB_COUNTS['oracle'], 'type' => 'docker'];
         if ($c) oci_close($c);
     } else {
-        $engines['oracle'] = ['status' => 'no_driver', 'labs' => 14, 'type' => 'docker'];
+        $engines['oracle'] = ['status' => 'no_driver', 'labs' => LAB_COUNTS['oracle'], 'type' => 'docker'];
     }
 
     // MongoDB
@@ -187,10 +207,10 @@ function getEngineStatuses() {
             $m = new MongoDB\Driver\Manager(sprintf("mongodb://%s:%s@%s:%d/?authSource=admin&connectTimeoutMS=2000",
                 MONGODB_USER, MONGODB_PASS, MONGODB_HOST, MONGODB_PORT));
             $m->executeCommand('admin', new MongoDB\Driver\Command(['ping' => 1]));
-            $engines['mongodb'] = ['status' => 'online', 'labs' => 8, 'type' => 'docker'];
-        } catch (Exception $e) { $engines['mongodb'] = ['status' => 'offline', 'labs' => 8, 'type' => 'docker']; }
+            $engines['mongodb'] = ['status' => 'online', 'labs' => LAB_COUNTS['mongodb'], 'type' => 'docker'];
+        } catch (Exception $e) { $engines['mongodb'] = ['status' => 'offline', 'labs' => LAB_COUNTS['mongodb'], 'type' => 'docker']; }
     } else {
-        $engines['mongodb'] = ['status' => 'no_driver', 'labs' => 8, 'type' => 'docker'];
+        $engines['mongodb'] = ['status' => 'no_driver', 'labs' => LAB_COUNTS['mongodb'], 'type' => 'docker'];
     }
 
     // Redis
@@ -200,11 +220,11 @@ function getEngineStatuses() {
             $r->connect(REDIS_HOST, REDIS_PORT, 2);
             $r->auth(REDIS_PASS);
             $r->ping();
-            $engines['redis'] = ['status' => 'online', 'labs' => 5, 'type' => 'docker'];
+            $engines['redis'] = ['status' => 'online', 'labs' => LAB_COUNTS['redis'], 'type' => 'docker'];
             $r->close();
-        } catch (Exception $e) { $engines['redis'] = ['status' => 'offline', 'labs' => 5, 'type' => 'docker']; }
+        } catch (Exception $e) { $engines['redis'] = ['status' => 'offline', 'labs' => LAB_COUNTS['redis'], 'type' => 'docker']; }
     } else {
-        $engines['redis'] = ['status' => 'no_driver', 'labs' => 5, 'type' => 'docker'];
+        $engines['redis'] = ['status' => 'no_driver', 'labs' => LAB_COUNTS['redis'], 'type' => 'docker'];
     }
 
     // HQL
@@ -213,7 +233,7 @@ function getEngineStatuses() {
     $resp = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    $engines['hql'] = ['status' => $code === 200 ? 'online' : 'offline', 'labs' => 5, 'type' => 'docker'];
+    $engines['hql'] = ['status' => $code === 200 ? 'online' : 'offline', 'labs' => LAB_COUNTS['hql'], 'type' => 'docker'];
 
     // GraphQL
     $ch = curl_init(GRAPHQL_API_URL . '/health');
@@ -221,7 +241,7 @@ function getEngineStatuses() {
     $resp = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    $engines['graphql'] = ['status' => $code === 200 ? 'online' : 'offline', 'labs' => 5, 'type' => 'docker'];
+    $engines['graphql'] = ['status' => $code === 200 ? 'online' : 'offline', 'labs' => LAB_COUNTS['graphql'], 'type' => 'docker'];
 
     return $engines;
 }
@@ -229,16 +249,16 @@ function getEngineStatuses() {
 require_once __DIR__ . '/../includes/header.php';
 
 $labDescriptions = [
-    'mysql'   => ['name' => 'MySQL',      'icon' => 'MY', 'color' => 'mysql',    'port' => '3306',  'labs' => 20, 'type' => 'native'],
-    'pgsql'   => ['name' => 'PostgreSQL',  'icon' => 'PG', 'color' => 'pgsql',    'port' => '5432',  'labs' => 15, 'type' => 'native'],
-    'sqlite'  => ['name' => 'SQLite',      'icon' => 'SL', 'color' => 'sqlite',   'port' => 'file',  'labs' => 10, 'type' => 'native'],
-    'mariadb' => ['name' => 'MariaDB',     'icon' => 'MA', 'color' => 'mariadb',  'port' => '3306',  'labs' =>  8, 'type' => 'native'],
-    'mssql'   => ['name' => 'MSSQL',       'icon' => 'MS', 'color' => 'mssql',    'port' => '1433',  'labs' => 18, 'type' => 'docker'],
-    'oracle'  => ['name' => 'Oracle',      'icon' => 'OR', 'color' => 'oracle',   'port' => '1521',  'labs' => 14, 'type' => 'docker'],
-    'mongodb' => ['name' => 'MongoDB',     'icon' => 'MG', 'color' => 'mongodb',  'port' => '27017', 'labs' =>  8, 'type' => 'docker'],
-    'redis'   => ['name' => 'Redis',       'icon' => 'RD', 'color' => 'redis',    'port' => '6379',  'labs' =>  5, 'type' => 'docker'],
-    'hql'     => ['name' => 'HQL',         'icon' => 'HQ', 'color' => 'hql',      'port' => '8081',  'labs' =>  5, 'type' => 'docker'],
-    'graphql' => ['name' => 'GraphQL',     'icon' => 'GQ', 'color' => 'graphql',  'port' => '4000',  'labs' =>  5, 'type' => 'docker'],
+    'mysql'   => ['name' => 'MySQL',      'icon' => 'MY', 'color' => 'mysql',    'port' => '3306',  'labs' => LAB_COUNTS['mysql'],   'type' => 'native'],
+    'pgsql'   => ['name' => 'PostgreSQL',  'icon' => 'PG', 'color' => 'pgsql',    'port' => '5432',  'labs' => LAB_COUNTS['pgsql'],   'type' => 'native'],
+    'sqlite'  => ['name' => 'SQLite',      'icon' => 'SL', 'color' => 'sqlite',   'port' => 'file',  'labs' => LAB_COUNTS['sqlite'],  'type' => 'native'],
+    'mariadb' => ['name' => 'MariaDB',     'icon' => 'MA', 'color' => 'mariadb',  'port' => '3306',  'labs' => LAB_COUNTS['mariadb'], 'type' => 'native'],
+    'mssql'   => ['name' => 'MSSQL',       'icon' => 'MS', 'color' => 'mssql',    'port' => '1433',  'labs' => LAB_COUNTS['mssql'],   'type' => 'docker'],
+    'oracle'  => ['name' => 'Oracle',      'icon' => 'OR', 'color' => 'oracle',   'port' => '1521',  'labs' => LAB_COUNTS['oracle'],  'type' => 'docker'],
+    'mongodb' => ['name' => 'MongoDB',     'icon' => 'MG', 'color' => 'mongodb',  'port' => '27017', 'labs' => LAB_COUNTS['mongodb'], 'type' => 'docker'],
+    'redis'   => ['name' => 'Redis',       'icon' => 'RD', 'color' => 'redis',    'port' => '6379',  'labs' => LAB_COUNTS['redis'],   'type' => 'docker'],
+    'hql'     => ['name' => 'HQL',         'icon' => 'HQ', 'color' => 'hql',      'port' => '8081',  'labs' => LAB_COUNTS['hql'],     'type' => 'docker'],
+    'graphql' => ['name' => 'GraphQL',     'icon' => 'GQ', 'color' => 'graphql',  'port' => '4000',  'labs' => LAB_COUNTS['graphql'], 'type' => 'docker'],
 ];
 
 $solved = 0;
@@ -272,7 +292,7 @@ foreach ($_SESSION as $k => $v) {
     <?php if (isset($_GET['cleanup'])): ?>
         <?php $dropped = (int)($_GET['dropped'] ?? 0); $errs = (int)($_GET['errors'] ?? 0); ?>
         <div class="<?= $errs > 0 ? 'result-warning' : 'result-success' ?> result-box" style="margin-bottom:14px;">
-            Cleanup complete: <?= $dropped ?> database(s) dropped<?= $errs > 0 ? ", $errs error(s)" : '' ?>.
+            Cleanup complete: <?= $dropped ?> database(s)/engine(s) dropped<?= $errs > 0 ? ", $errs error(s)" : '' ?>.
             Session progress cleared.
         </div>
     <?php endif; ?>
@@ -285,14 +305,14 @@ foreach ($_SESSION as $k => $v) {
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
             <button class="btn btn-primary" onclick="refreshStatus()" style="padding:8px 18px;">Refresh Status</button>
             <form method="POST" style="margin:0;">
+                <?= csrf_field() ?>
                 <input type="hidden" name="reset_all" value="1">
                 <button type="submit" class="btn btn-ghost" style="padding:8px 18px;" onclick="return confirm('Reset ALL lab databases to their default state?')">Reset All Databases</button>
             </form>
             <button class="btn" onclick="clearProgress()" style="padding:8px 18px;background:var(--neon4-dim);color:var(--neon4);border:1px solid rgba(255,175,54,0.2);">Clear All Progress</button>
-            <button class="btn btn-danger" onclick="openCleanupModal()" style="padding:8px 18px;">Drop All Databases</button>
         </div>
         <div style="margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--text-2);">
-            Progress: <?= $solved ?>/108 labs solved
+            Progress: <?= $solved ?>/<?= LAB_TOTAL ?> labs solved
         </div>
     </section>
 
@@ -354,7 +374,7 @@ foreach ($_SESSION as $k => $v) {
                     <span class="admin-tag admin-tag-info">first time</span>
                 </div>
                 <p class="admin-desc">
-                    Run once after cloning. Installs all system packages, PHP extensions, starts services, initializes 108 labs across 10 engines, and deploys the web app.
+                    Run once after cloning. Installs all system packages, PHP extensions, starts services, initializes <?= LAB_TOTAL ?> labs across <?= count(LAB_COUNTS) ?> engines, and deploys the web app.
                 </p>
                 <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
                     <button class="btn btn-ghost btn-sm" onclick="copyCmd('sudo bash install.sh')">Copy Command</button>
@@ -432,11 +452,11 @@ foreach ($_SESSION as $k => $v) {
                     <span class="admin-tag admin-tag-danger">destructive</span>
                 </div>
                 <p class="admin-desc">
-                    Removes everything: drops all databases and users, stops and removes Docker containers and volumes, removes web deployment and hosts entry. Optionally uninstalls system packages.
+                    Complete end-to-end teardown: drops all databases and users, removes SQLite files, flushes MongoDB/Redis, stops and removes Docker containers and volumes, removes the web deployment, clears hosts entry, and destroys your session. Everything gone.
                 </p>
                 <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-                    <button class="btn btn-danger btn-sm" onclick="openCleanupModal()">Drop All Databases</button>
-                    <button class="btn btn-ghost btn-sm" onclick="copyCmd('sudo bash setup/cleanup.sh')">Copy Full Cleanup</button>
+                    <button class="btn btn-danger btn-sm" onclick="openCleanupModal()">Full Cleanup</button>
+                    <button class="btn btn-ghost btn-sm" onclick="copyCmd('sudo bash setup/cleanup.sh')">Copy CLI Command</button>
                 </div>
                 <div class="terminal" style="margin:10px 0 0;">
                     <div class="terminal-header">
@@ -454,22 +474,31 @@ foreach ($_SESSION as $k => $v) {
         </div>
     </section>
 
-    <!-- Cleanup Confirmation Modal -->
+    <!-- Full Cleanup Confirmation Modal -->
     <div id="cleanupModal" class="modal-overlay hidden">
         <div class="modal-box">
-            <h3 style="color:var(--neon3);">// confirm cleanup</h3>
+            <h3 style="color:var(--neon3);">// confirm full cleanup</h3>
             <p>
-                This will <strong>permanently drop</strong> all sqli_arena_* databases
-                and clear your solved progress. This cannot be undone.
+                This will <strong>permanently remove everything</strong>:
             </p>
-            <p style="font-family:var(--font-mono);font-size:12px;color:var(--text-2);">
-                To restore after cleanup, re-run setup or click "Reset All Databases".
+            <ul style="margin:8px 0;padding-left:20px;font-size:13px;color:var(--text-1);">
+                <li>Drop all sqli_arena_* databases + users (MySQL, PostgreSQL, MariaDB)</li>
+                <li>Delete all SQLite database files and data directory</li>
+                <li>Drop all MongoDB databases and flush Redis</li>
+                <li>Stop and remove all 6 Docker containers + volumes</li>
+                <li>Remove the web deployment (/var/www/html/SQLi-Arena)</li>
+                <li>Remove sqli-arena.local from /etc/hosts</li>
+                <li>Destroy session and clear all progress</li>
+            </ul>
+            <p style="font-family:var(--font-mono);font-size:12px;color:var(--neon3);">
+                The website will go offline. To reinstall: cd ~/SQLi-Arena && sudo bash install.sh
             </p>
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="closeCleanupModal()">cancel</button>
                 <form method="POST" style="margin:0;">
-                    <input type="hidden" name="cleanup_action" value="drop_all_databases">
-                    <button type="submit" class="btn btn-danger">drop everything</button>
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="cleanup_action" value="full_cleanup">
+                    <button type="submit" class="btn btn-danger">remove everything</button>
                 </form>
             </div>
         </div>
@@ -680,7 +709,6 @@ function openCleanupModal() {
 function closeCleanupModal() {
     document.getElementById('cleanupModal').classList.add('hidden');
 }
-
 document.addEventListener('DOMContentLoaded', refreshStatus);
 </script>
 

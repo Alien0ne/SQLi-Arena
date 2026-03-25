@@ -1,18 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 2: Auth Bypass via $gt Operator
- * Difficulty: Easy
- *
- * Vulnerability: Similar to Lab 1, but uses the $gt (greater than) operator.
- * password[$gt]= creates {"$gt": ""} which matches any password string
- * greater than empty string (i.e., any non-empty password).
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName
- * provided by includes/db.php). Collection: lab2_users
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -20,15 +10,14 @@ $logged_in_user = null;
 $query_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_gt_0p3r4t0r_byp4ss}') {
         $_SESSION['mongodb_lab2_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab2", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab2", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -75,7 +64,7 @@ if (isset($_POST['login_submit'])) {
 
     <h4>Scenario</h4>
     <p>
-        This application uses the same vulnerable pattern as Lab 1: user input is
+        An application uses the same vulnerable pattern as Lab 1: user input is
         passed directly to a MongoDB query. However, the developer has added a basic check
         that rejects empty password values. You need a different operator this time.
     </p>
@@ -96,13 +85,17 @@ if (isset($_POST['login_submit'])) {
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

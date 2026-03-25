@@ -1,17 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 5: Aggregation Pipeline Injection
- * Difficulty: Hard
- *
- * Vulnerability: The application builds an aggregation pipeline from user input.
- * An attacker can inject additional pipeline stages ($match, $group, $project)
- * or manipulate the $lookup stage to access the secret_analytics collection.
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName from db.php).
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -19,15 +10,14 @@ $results = [];
 $query_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_4ggr3g4t3_p1p3l1n3}') {
         $_SESSION['mongodb_lab5_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab5", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab5", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -67,7 +57,7 @@ if (isset($_POST['category']) || isset($_POST['pipeline'])) {
                 // Deep convert: handle nested objects in result arrays
                 $results = json_decode(json_encode($results), true);
             } catch (Exception $e) {
-                $result_message = "Pipeline error: " . $e->getMessage();
+                $result_message = "Pipeline error: " . htmlspecialchars($e->getMessage());
                 $result_type = "error";
             }
         }
@@ -110,7 +100,7 @@ if (isset($_POST['category']) || isset($_POST['pipeline'])) {
             }
             $results = json_decode(json_encode($results), true);
         } catch (Exception $e) {
-            $result_message = "Query error: " . $e->getMessage();
+            $result_message = "Query error: " . htmlspecialchars($e->getMessage());
             $result_type = "error";
         }
     }
@@ -123,7 +113,7 @@ if (isset($_POST['category']) || isset($_POST['pipeline'])) {
 
     <h4>Scenario</h4>
     <p>
-        This e-commerce application uses MongoDB's aggregation pipeline to filter and
+        An e-commerce application uses MongoDB's aggregation pipeline to filter and
         display products. The application also accepts a raw JSON pipeline parameter
         for "advanced search." A separate <code>secret_analytics</code> collection stores
         sensitive data including a flag.
@@ -146,13 +136,17 @@ if (isset($_POST['category']) || isset($_POST['pipeline'])) {
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

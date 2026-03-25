@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   KEY VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['admin_password'])) {
-    $submitted = $_POST['admin_password'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['admin_password'])) {
 
     if ($row && $submitted === $row['key_value']) {
         $_SESSION['mariadb_lab3_solved'] = true;
-        header("Location: " . url_lab_from_slug("mariadb/lab3", $mode));
+        header("Location: " . url_lab_from_slug("mariadb/lab3", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -83,9 +83,9 @@ if (isset($_POST['admin_password'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Federation Key</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="admin_password" class="input" placeholder="Enter the federation key (flag)..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -124,7 +124,7 @@ if (isset($_POST['host'])) {
     $query = "SELECT hostname, status FROM servers WHERE hostname LIKE '%$host%'";
 
     // Show the executed query in a terminal block
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

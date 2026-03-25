@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   CREDENTIAL SECRET VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['credential_secret'])) {
-    $submitted = $_POST['credential_secret'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['credential_secret'])) {
 
     if ($row && $submitted === $row['secret']) {
         $_SESSION['mysql_lab17_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab17", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab17", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -92,9 +92,9 @@ if ($cookie_uid !== null && $cookie_uid !== '') {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Credential Secret</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="credential_secret" class="input" placeholder="Enter the database credential secret..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 

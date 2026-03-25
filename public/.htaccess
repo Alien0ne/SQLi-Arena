@@ -25,13 +25,22 @@ RewriteRule ^cheatsheet/?$ cheatsheet.php [L,QSA]
 # /SQLi-Arena/{engine} → labs.php?db={engine}
 RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/?$ labs.php?db=$1 [L,QSA]
 
-# /SQLi-Arena/{engine}/lab{N}/source → lab.php?lab={engine}/lab{N}&mode=white
+# /SQLi-Arena/{engine}/lab{N}/source/ref/{ref}
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/source/ref/([a-z0-9-]+)/?$ lab.php?lab=$1/lab$2&mode=white&ref=$3 [L,QSA]
+
+# /SQLi-Arena/{engine}/lab{N}/solution/ref/{ref}
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/solution/ref/([a-z0-9-]+)/?$ lab.php?lab=$1/lab$2&mode=solution&ref=$3 [L,QSA]
+
+# /SQLi-Arena/{engine}/lab{N}/ref/{ref}
+RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/ref/([a-z0-9-]+)/?$ lab.php?lab=$1/lab$2&mode=black&ref=$3 [L,QSA]
+
+# /SQLi-Arena/{engine}/lab{N}/source
 RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/source/?$ lab.php?lab=$1/lab$2&mode=white [L,QSA]
 
-# /SQLi-Arena/{engine}/lab{N}/solution → lab.php?lab={engine}/lab{N}&mode=solution
+# /SQLi-Arena/{engine}/lab{N}/solution
 RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/solution/?$ lab.php?lab=$1/lab$2&mode=solution [L,QSA]
 
-# /SQLi-Arena/{engine}/lab{N} → lab.php?lab={engine}/lab{N}&mode=black
+# /SQLi-Arena/{engine}/lab{N}
 RewriteRule ^(mysql|pgsql|sqlite|mssql|oracle|mariadb|mongodb|redis|hql|graphql)/lab([0-9]+)/?$ lab.php?lab=$1/lab$2&mode=black [L,QSA]
 
 # /SQLi-Arena/ → index.php

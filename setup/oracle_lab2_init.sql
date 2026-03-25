@@ -1,28 +1,25 @@
--- =========================
--- SQLi-Arena: Oracle Lab 2
--- UNION -- ALL_TABLES Enumeration
--- =========================
--- Run as SYSDBA:
--- CREATE USER sqli_arena_oracle_lab2 IDENTIFIED BY sqli_arena_2026;
--- GRANT CONNECT, RESOURCE TO sqli_arena_oracle_lab2;
--- Connect as lab user:
+-- Oracle Lab 2: UNION ALL_TABLES Enumeration
+-- Tables: products (id, name, price, description), hidden_table (id, secret)
 
 CREATE TABLE products (
     id          NUMBER PRIMARY KEY,
-    name        VARCHAR2(100) NOT NULL,
-    price       NUMBER(10,2)  NOT NULL,
-    description VARCHAR2(200)
+    name        VARCHAR2(200) NOT NULL,
+    price       NUMBER(10,2),
+    description VARCHAR2(500)
 );
 
-INSERT INTO products VALUES (1, 'Wireless Mouse',     29.99,  'Ergonomic wireless mouse');
-INSERT INTO products VALUES (2, 'Mechanical Keyboard', 89.99, 'RGB backlit keyboard');
-INSERT INTO products VALUES (3, 'USB Hub',            14.99,  '4-port USB 3.0 hub');
-INSERT INTO products VALUES (4, 'Monitor Stand',      49.99,  'Adjustable monitor riser');
+INSERT INTO products (id, name, price, description) VALUES (1, 'Wireless Mouse', 29.99, 'Ergonomic wireless mouse with USB receiver');
+INSERT INTO products (id, name, price, description) VALUES (2, 'Mechanical Keyboard', 89.50, 'RGB mechanical keyboard with Cherry MX switches');
+INSERT INTO products (id, name, price, description) VALUES (3, 'USB-C Hub', 45.00, '7-in-1 USB-C hub with HDMI and Ethernet');
+INSERT INTO products (id, name, price, description) VALUES (4, 'Monitor Stand', 34.99, 'Adjustable aluminum monitor stand');
+INSERT INTO products (id, name, price, description) VALUES (5, 'Webcam HD', 59.99, '1080p HD webcam with built-in microphone');
 
-CREATE TABLE secret_flags (
-    id    NUMBER PRIMARY KEY,
-    flag  VARCHAR2(100) NOT NULL
+CREATE TABLE hidden_table (
+    id     NUMBER PRIMARY KEY,
+    secret VARCHAR2(200)
 );
 
-INSERT INTO secret_flags VALUES (1, 'FLAG{or_4ll_t4bl3s_3num}');
+INSERT INTO hidden_table (id, secret) VALUES (1, 'FLAG{or_4ll_t4bl3s_3num}');
+
 COMMIT;
+EXIT;

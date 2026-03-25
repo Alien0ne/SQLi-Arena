@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   MASTER PASSWORD VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['admin_password'])) {
-    $submitted = $_POST['admin_password'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['admin_password'])) {
 
     if ($row && $submitted === $row['password']) {
         $_SESSION['mysql_lab12_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab12", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab12", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -65,9 +65,9 @@ if (isset($_POST['admin_password'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Master Password</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="admin_password" class="input" placeholder="Enter the master password..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -111,7 +111,7 @@ if (isset($_POST['search'])) {
         $query = "SELECT * FROM audit_log WHERE event LIKE '%$search%'";
 
         // Show the executed query in a terminal block
-        echo '<div class="terminal">';
+        echo '<div class="terminal query-output">';
         echo '  <div class="terminal-header">';
         echo '    <span class="terminal-dot red"></span>';
         echo '    <span class="terminal-dot yellow"></span>';

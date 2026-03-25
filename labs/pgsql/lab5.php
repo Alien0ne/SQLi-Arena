@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT token FROM admin_tokens LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['token']) {
         $_SESSION['pgsql_lab5_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab5", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab5", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,18 +24,17 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This token validation endpoint always returns the same message: <strong>"Session checked."</strong>
-        regardless of whether the token is valid or not. There are no errors, no differences in output.
-        The only side-channel available is <strong>response time</strong>. Use PostgreSQL's
-        <code>pg_sleep()</code> function to create measurable delays based on conditional logic.
+        A token validation endpoint always returns the same message: <strong>"Session checked."</strong>
+        regardless of whether the token is valid or not. There are no errors and no differences in
+        output. The only side-channel available is <strong>response time</strong>.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong> <code>pg_sleep(seconds)</code> for time delays,
-    <code>CASE WHEN ... THEN ... ELSE ... END</code> for conditional logic.</p>
-    <p><strong>Table Schemas:</strong></p>
-    <ul>
-        <li><code>sessions(id serial, token varchar)</code></li>
-        <li><code>admin_tokens(id serial, token varchar)</code>: contains the flag</li>
-    </ul>
+
+    <h4>Objective</h4>
+    <p>
+        Use PostgreSQL's <code>pg_sleep()</code> function with conditional logic to extract the
+        <strong>admin token</strong> from the <code>admin_tokens</code> table character by character
+        through time-based blind injection.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint5">&#128161; Click for hints</span>
@@ -50,9 +49,9 @@ if (isset($_POST['flag_input'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Admin Token</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the admin token..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -90,7 +89,7 @@ if (isset($_POST['token'])) {
 
     $query = "SELECT id FROM sessions WHERE token = '$input'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

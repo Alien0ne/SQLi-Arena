@@ -7,15 +7,15 @@ $verify_error = null;
 /* =====================
    FLAG VERIFY
 ===================== */
-if (isset($_POST['flag_field'])) {
-    $submitted = $_POST['flag_field'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = pg_query($conn, "SELECT secret FROM credentials WHERE service = 'internal_api' LIMIT 1");
     $row = pg_fetch_assoc($res);
 
     if ($row && $submitted === $row['secret']) {
         $_SESSION['pgsql_lab15_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab15", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab15", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -60,9 +60,9 @@ if (isset($_POST['flag_field'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit API Secret</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_field" class="input" placeholder="Enter the API secret..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -103,7 +103,7 @@ if (isset($_POST['username']) && isset($_POST['bio'])) {
     $query = "INSERT INTO profiles (username, bio) VALUES ('$username', '$bio') RETURNING id";
 
     // Show the executed query
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

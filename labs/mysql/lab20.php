@@ -9,10 +9,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   SECRET VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['secret'])) {
-    $submitted = $_POST['secret'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -22,7 +22,7 @@ if (isset($_POST['secret'])) {
 
     if ($row && $submitted === $row['secret']) {
         $_SESSION['mysql_lab20_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab20", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab20", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -73,9 +73,9 @@ if (isset($_POST['secret'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Secret</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="secret" class="input" placeholder="Enter the secret value..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -144,7 +144,7 @@ if (isset($_POST['username']) && $_POST['username'] !== '') {
     $query = "SELECT username, email FROM users WHERE username = '$escaped'";
 
     // Show the executed query
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

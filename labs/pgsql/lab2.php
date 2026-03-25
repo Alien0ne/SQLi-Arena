@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT secret_code FROM products WHERE id = 1 LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['secret_code']) {
         $_SESSION['pgsql_lab2_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab2", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab2", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,13 +24,16 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This product search feature uses <code>addslashes()</code> to escape single quotes in your input.
+        A product search feature uses <code>addslashes()</code> to escape single quotes in your input.
         However, PostgreSQL supports an alternative string quoting mechanism called <strong>dollar-quoting</strong>
         (<code>$$string$$</code>) that bypasses traditional quote escaping entirely.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong> Dollar-quoting (<code>$$text$$</code> or <code>$tag$text$tag$</code>)
-    as an alternative to single-quoted strings, bypassing <code>addslashes()</code> filters.</p>
-    <p><strong>Table Schema:</strong> <code>products(id serial, name varchar, price numeric, secret_code varchar)</code></p>
+
+    <h4>Objective</h4>
+    <p>
+        Bypass the <code>addslashes()</code> filter using PostgreSQL's dollar-quoting syntax to perform
+        a UNION-based injection and extract the <strong>secret code</strong> from the <code>products</code> table.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint2">&#128161; Click for hints</span>
@@ -45,9 +48,9 @@ if (isset($_POST['flag_input'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Secret Code</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the secret code..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -85,7 +88,7 @@ if (isset($_POST['search'])) {
 
     $query = "SELECT id, name, price FROM products WHERE name ILIKE '%$input%'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

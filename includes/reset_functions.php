@@ -64,7 +64,7 @@ if (!defined('SQLI_ARENA_RESET_FUNCTIONS')) {
                 if (!file_exists($initFile)) return ['success' => false, 'message' => 'Init file not found'];
                 $dbName = MONGODB_DB_PREFIX . $labNum;
                 exec("docker cp " . escapeshellarg($initFile) . " sqli-arena-mongodb:/tmp/lab_init.js 2>&1");
-                $output = shell_exec("docker exec sqli-arena-mongodb mongosh --username '" . MONGODB_USER . "' --password '" . MONGODB_PASS . "' --authenticationDatabase admin " . escapeshellarg($dbName) . " --file /tmp/lab_init.js 2>&1");
+                $output = shell_exec("docker exec sqli-arena-mongodb mongosh --username " . escapeshellarg(MONGODB_USER) . " --password " . escapeshellarg(MONGODB_PASS) . " --authenticationDatabase admin " . escapeshellarg($dbName) . " --file /tmp/lab_init.js 2>&1");
                 $result = ['success' => true, 'message' => "MongoDB lab $labNum reset"];
                 break;
 
@@ -88,7 +88,7 @@ if (!defined('SQLI_ARENA_RESET_FUNCTIONS')) {
                 if (!file_exists($initFile)) return ['success' => false, 'message' => 'Init file not found'];
                 $oraUser = ORACLE_USER_PREFIX . $labNum;
                 exec("docker cp " . escapeshellarg($initFile) . " sqli-arena-oracle:/tmp/lab_init.sql 2>&1");
-                $output = shell_exec("docker exec sqli-arena-oracle bash -c \"echo @/tmp/lab_init.sql | sqlplus -S '" . $oraUser . "/" . ORACLE_PASS . "@//localhost:1521/XE'\" 2>&1");
+                $output = shell_exec("docker exec sqli-arena-oracle bash -c " . escapeshellarg("echo @/tmp/lab_init.sql | sqlplus -S " . escapeshellarg($oraUser . "/" . ORACLE_PASS . "@//localhost:1521/XE")) . " 2>&1");
                 $result = ['success' => true, 'message' => "Oracle lab $labNum reset"];
                 break;
 
@@ -110,9 +110,7 @@ if (!defined('SQLI_ARENA_RESET_FUNCTIONS')) {
     }
 
     function resetEngineDatabase($engine) {
-        $labCounts = ['mysql' => 20, 'pgsql' => 15, 'sqlite' => 10, 'mariadb' => 8,
-                      'mssql' => 18, 'oracle' => 14, 'mongodb' => 8, 'redis' => 5, 'hql' => 5, 'graphql' => 5];
-        $count = $labCounts[$engine] ?? 0;
+        $count = LAB_COUNTS[$engine] ?? 0;
         if ($count === 0) return ['success' => false, 'message' => "Unknown engine: $engine"];
 
         $failed = [];

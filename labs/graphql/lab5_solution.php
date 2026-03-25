@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     The Blog API has circular references between User and Friends with no depth limiting.
     The admin user's <code>privateNotes</code> are protected at the top level (returns null),

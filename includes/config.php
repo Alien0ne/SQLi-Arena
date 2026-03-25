@@ -57,6 +57,30 @@ define('HQL_API_URL', 'http://localhost:8081');
 // GraphQL Backend (Apollo Server)
 define('GRAPHQL_API_URL', 'http://localhost:4000');
 
+// Lab counts per engine (single source of truth)
+define('LAB_COUNTS', [
+    'mysql' => 20, 'pgsql' => 15, 'sqlite' => 10, 'mariadb' => 8,
+    'mssql' => 18, 'oracle' => 14, 'mongodb' => 8, 'redis' => 5,
+    'hql' => 5, 'graphql' => 5
+]);
+define('LAB_TOTAL', array_sum(LAB_COUNTS));
+
+// CSRF protection
+function csrf_token() {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+function csrf_field() {
+    return '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">';
+}
+function csrf_verify() {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    return isset($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token']);
+}
+
 // App
 define('APP_NAME', 'SQLi-Arena');
 define('APP_ROOT', '/SQLi-Arena');
@@ -64,19 +88,20 @@ define('APP_ROOT', '/SQLi-Arena');
 // Clean URL helpers
 function url_home()    { return APP_ROOT . '/'; }
 function url_engine($e){ return APP_ROOT . '/' . $e; }
-function url_lab($e, $n, $mode = 'black') {
+function url_lab($e, $n, $mode = 'black', $ref = '') {
     $base = APP_ROOT . '/' . $e . '/lab' . $n;
-    if ($mode === 'white')    return $base . '/source';
-    if ($mode === 'solution') return $base . '/solution';
+    if ($mode === 'white')    $base .= '/source';
+    if ($mode === 'solution') $base .= '/solution';
+    if ($ref) $base .= '/ref/' . $ref;
     return $base;
 }
 function url_page($p)  { return APP_ROOT . '/' . $p; }
 function url_topic($slug) { return APP_ROOT . '/attack-types/' . $slug; }
 function url_phase($id)   { return APP_ROOT . '/learning-path/' . $id; }
 // Parse lab slug (e.g. "mysql/lab1") into clean URL
-function url_lab_from_slug($slug, $mode = 'black') {
+function url_lab_from_slug($slug, $mode = 'black', $ref = '') {
     if (preg_match('#^(\w+)/lab(\d+)$#', $slug, $m)) {
-        return url_lab($m[1], $m[2], $mode);
+        return url_lab($m[1], $m[2], $mode, $ref);
     }
     return APP_ROOT . '/';
 }

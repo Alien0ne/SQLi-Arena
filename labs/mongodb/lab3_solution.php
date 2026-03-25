@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Confirm Injection</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">POST: </span>username=admin&amp;password[$ne]=<br>
+        <span class="prompt">Input: </span>username=admin&amp;password[$ne]=<br>
         <span class="prompt">Output: </span>Login successful! Welcome, <strong>admin</strong>.<br>
         <span class="prompt">// Password is NOT displayed -- this is a blind scenario</span>
     </div>
@@ -30,11 +30,11 @@
         <span class="terminal-title">Step 2: $regex Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">POST: </span>username=admin&amp;password[$regex]=^F<br>
+        <span class="prompt">Input: </span>username=admin&amp;password[$regex]=^F<br>
         <span class="prompt">Output: </span><strong>Login successful!</strong> (starts with F)<br><br>
-        <span class="prompt">POST: </span>username=admin&amp;password[$regex]=^X<br>
+        <span class="prompt">Input: </span>username=admin&amp;password[$regex]=^X<br>
         <span class="prompt">Output: </span>Invalid credentials. (doesn't start with X)<br><br>
-        <span class="prompt">POST: </span>username=admin&amp;password[$regex]=^FL<br>
+        <span class="prompt">Input: </span>username=admin&amp;password[$regex]=^FL<br>
         <span class="prompt">Output: </span><strong>Login successful!</strong> (starts with FL)
     </div>
 </div>

@@ -1,17 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 8: BSON $type / $exists Enumeration
- * Difficulty: Medium
- *
- * Vulnerability: The $type and $exists operators allow attackers to enumerate
- * which fields exist in documents and what BSON types they contain. Combined
- * with $regex, this enables full schema discovery and data extraction.
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName from db.php).
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -19,15 +10,14 @@ $search_results = [];
 $query_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_bs0n_typ3_3x1sts}') {
         $_SESSION['mongodb_lab8_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab8", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab8", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -66,7 +56,7 @@ if (isset($_POST['field']) && isset($_POST['value'])) {
             ];
         }
     } catch (Exception $e) {
-        $result_message = "Query error: " . $e->getMessage();
+        $result_message = "Query error: " . htmlspecialchars($e->getMessage());
         $result_type = "error";
     }
 }
@@ -78,7 +68,7 @@ if (isset($_POST['field']) && isset($_POST['value'])) {
 
     <h4>Scenario</h4>
     <p>
-        This user management interface allows searching by field name and value.
+        A user management interface allows searching by field name and value.
         The search value field accepts JSON for advanced queries. The application processes
         MongoDB operators including <code>$type</code> and <code>$exists</code>, which
         allow enumerating document schemas and field types without knowing the data.
@@ -101,13 +91,17 @@ if (isset($_POST['field']) && isset($_POST['value'])) {
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

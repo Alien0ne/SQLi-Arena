@@ -8,31 +8,25 @@ $verify_error = null;
    Real HQL Spring Boot backend
    =========================== */
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{hq_cl4ss_m3t4d4t4}') {
         $_SESSION['hql_lab2_solved'] = true;
-        header("Location: " . url_lab_from_slug("hql/lab2", $mode));
+        header("Location: " . url_lab_from_slug("hql/lab2", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>HQL Backend Unavailable</strong>: <?= htmlspecialchars($driver_missing) ?> is not running.
-    Start it with: <code>bash setup/docker_start.sh</code>
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
-    <h3>Lab 2: .class Metadata Access</h3>
+    <h3>Lab 2. .class Metadata Access</h3>
 
     <h4>Scenario</h4>
     <p>
-        The User Profile API allows querying user data via HQL. Users can specify which
+        A user profile API allows querying user data via HQL. Users can specify which
         properties to select using dot notation (e.g., <code>username</code>, <code>email</code>).
     </p>
 
@@ -54,7 +48,7 @@ if (isset($_POST['flag_field'])) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <?php if (!empty($_SESSION['hql_lab2_solved'])): ?>
@@ -66,8 +60,8 @@ if (isset($_POST['flag_field'])) {
             <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
         <?php endif; ?>
         <form method="POST" class="form-row">
-            <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-            <button type="submit" class="btn btn-primary">Submit Flag</button>
+            <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+            <button type="submit" class="btn btn-primary">Verify</button>
         </form>
     <?php endif; ?>
 </div>
@@ -112,7 +106,7 @@ if (isset($_POST['flag_field'])) {
         }
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">HQL Query</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">HQL: </span>' . htmlspecialchars($hql);
@@ -161,7 +155,7 @@ if (isset($_POST['flag_field'])) {
                 echo '<div class="result-error result-box"><strong>Error:</strong> Unexpected response from backend.</div>';
             }
         } else {
-            echo '<div class="result-warning result-box">HQL backend is not running. Start it with: <code>bash setup/docker_start.sh</code></div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> HQL backend is not running. Is the Docker container up?</div>';
         }
     }
     ?>

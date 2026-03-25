@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_dbms_p1p3_t1m3}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT token FROM admin_tokens WHERE id=1";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['TOKEN']) {
         $_SESSION['oracle_lab7_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab7", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab7", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,16 +27,11 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This login form provides identical responses for success and failure: you cannot
+        A login form provides identical responses for success and failure — you cannot
         distinguish between valid and invalid queries by content alone. However, Oracle's
         <code>DBMS_PIPE.RECEIVE_MESSAGE('pipe_name', seconds)</code> function blocks execution
         for the specified number of seconds, enabling time-based blind extraction.
     </p>
-    <p><strong>Oracle Concepts:</strong> <code>DBMS_PIPE.RECEIVE_MESSAGE('x', N)</code> waits
-    for N seconds on a named pipe. Combined with <code>CASE WHEN</code>, this creates a
-    time-based oracle: if a condition is true, the response is delayed.</p>
-    <p><strong>Table Schema:</strong> <code>users(id NUMBER, username VARCHAR2, password VARCHAR2, active NUMBER)</code></p>
-    <p><strong>Hidden Table:</strong> <code>admin_tokens(id NUMBER, token VARCHAR2)</code></p>
 
     <h4>Objective</h4>
     <p>
@@ -60,7 +53,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -99,7 +92,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     $query = "SELECT id FROM users WHERE username = '$username' AND password = '$password' AND active = 1";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -120,8 +113,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         echo '<div class="result-box"><strong>Login request processed.</strong> If your credentials are valid, you will be redirected shortly.</div>';
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

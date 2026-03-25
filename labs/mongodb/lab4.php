@@ -1,18 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 4: Server-Side JS Injection via $where
- * Difficulty: Hard
- *
- * Vulnerability: The $where clause accepts JavaScript expressions that are
- * evaluated server-side. If user input is concatenated into a $where string,
- * it enables JavaScript injection: far more powerful than operator injection.
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName
- * provided by includes/db.php). Collection: lab4_users
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -20,15 +10,14 @@ $found_users = [];
 $query_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_wh3r3_js_1nj3ct}') {
         $_SESSION['mongodb_lab4_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab4", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab4", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -64,7 +53,7 @@ if (isset($_POST['search'])) {
 
     <h4>Scenario</h4>
     <p>
-        This application uses MongoDB's <code>$where</code> clause to search for users.
+        An application uses MongoDB's <code>$where</code> clause to search for users.
         The <code>$where</code> operator accepts JavaScript expressions that are evaluated
         server-side. The developer concatenates user input directly into the JS expression,
         allowing JavaScript injection.
@@ -88,13 +77,17 @@ if (isset($_POST['search'])) {
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

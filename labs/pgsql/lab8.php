@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT secret_value FROM secret_data LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['secret_value']) {
         $_SESSION['pgsql_lab8_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab8", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab8", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,23 +24,16 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This feedback form uses an <code>INSERT</code> statement to store user feedback. The injection
-        point is in the INSERT values. Your goal is to extract the flag from the <code>secret_data</code>
-        table using error-based extraction (CAST), and learn the file-write techniques available
-        in PostgreSQL.
+        A feedback form uses an <code>INSERT</code> statement to store user feedback. The injection
+        point is in the INSERT values. PostgreSQL supports file-write techniques like
+        <code>COPY ... TO</code> and <code>lo_export()</code>.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong></p>
-    <ul>
-        <li><code>COPY table TO '/path/to/file'</code>: writes table data to a file</li>
-        <li><code>lo_export(oid, '/path/to/file')</code>: exports a large object to a file</li>
-        <li><code>lo_from_bytea(0, 'data')</code>: creates a large object from data</li>
-        <li>INSERT injection with subquery extraction via CAST errors</li>
-    </ul>
-    <p><strong>Table Schemas:</strong></p>
-    <ul>
-        <li><code>feedback(id serial, username varchar, message text, submitted_at timestamp)</code></li>
-        <li><code>secret_data(id serial, secret_value varchar)</code></li>
-    </ul>
+
+    <h4>Objective</h4>
+    <p>
+        Extract the <strong>secret value</strong> from the <code>secret_data</code> table using
+        error-based extraction via <code>CAST()</code>, and explore PostgreSQL's file-write capabilities.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint8">&#128161; Click for hints</span>
@@ -55,9 +48,9 @@ if (isset($_POST['flag_input'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Secret Value</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the secret value..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -96,7 +89,7 @@ if (isset($_POST['username']) && isset($_POST['message'])) {
 
     $query = "INSERT INTO feedback (username, message, submitted_at) VALUES ('$username', '$message', NOW())";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

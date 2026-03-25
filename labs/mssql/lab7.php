@@ -17,7 +17,7 @@ if (isset($_POST['flag'])) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && $submitted === $row['flag']) {
                 $_SESSION['mssql_lab7_solved'] = true;
-                header("Location: " . url_lab_from_slug("mssql/lab7", $mode));
+                header("Location: " . url_lab_from_slug("mssql/lab7", $mode, $_GET['ref'] ?? ''));
                 exit;
             } else {
                 $verify_error = "Incorrect. Keep trying!";
@@ -26,27 +26,14 @@ if (isset($_POST['flag'])) {
             $verify_error = "Database error. Is the MSSQL container running?";
         }
     } else {
-        // Simulation fallback
-        if ($submitted === 'FLAG{ms_xp_cmd_sh3ll_rc3}') {
-            $_SESSION['mssql_lab7_solved'] = true;
-            header("Location: " . url_lab_from_slug("mssql/lab7", $mode));
-            exit;
-        } else {
-            $verify_error = "Incorrect. Keep trying!";
-        }
+        $verify_error = "Database connection failed. Is the MSSQL container running?";
     }
 }
 ?>
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
-    <h3>Lab 7: xp_cmdshell: OS Command Execution</h3>
+    <h3>Lab 7. xp_cmdshell: OS Command Execution</h3>
 
     <h4>Scenario</h4>
     <p>
@@ -127,7 +114,7 @@ if (isset($_POST['q'])) {
     $query = "SELECT id, title, description FROM documents WHERE title LIKE '%$q%'";
 
     // Show the executed query in a terminal block
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';
@@ -160,8 +147,8 @@ if (isset($_POST['q'])) {
             echo '</div>';
         }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the MSSQL container running?';
         echo '</div>';
     }
 }

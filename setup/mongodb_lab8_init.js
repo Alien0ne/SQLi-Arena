@@ -1,13 +1,10 @@
-// MongoDB Init Script -- Lab 8: BSON $type / $exists Enumeration
-// Run: mongosh -u sqli_arena -p sqli_arena_2026 --authenticationDatabase admin < mongodb_lab8_init.js
-
-use sqli_arena_mongodb_lab8;
+// Lab 8: BSON $type / $exists Enumeration
+// Database: sqli_arena_mongodb_lab8 (set by setup script)
 
 db.lab8_documents.drop();
 
 db.lab8_documents.insertMany([
     {
-        _id: 1,
         username: "admin",
         password: "FLAG{mg_bs0n_typ3_3x1sts}",
         email: "admin@nosql-corp.io",
@@ -16,7 +13,6 @@ db.lab8_documents.insertMany([
         login_count: 42
     },
     {
-        _id: 2,
         username: "manager",
         password: "mgr2026!!",
         email: "mgr@nosql-corp.io",
@@ -24,12 +20,18 @@ db.lab8_documents.insertMany([
         login_count: 15
     },
     {
-        _id: 3,
         username: "temp",
         password: "temp1234",
         email: "temp@nosql-corp.io",
         role: "temp",
         login_count: 3
+    },
+    {
+        username: "security",
+        password: "s3cur1ty!",
+        email: "security@nosql-corp.io",
+        role: "security",
+        login_count: 28
     }
 ]);
 

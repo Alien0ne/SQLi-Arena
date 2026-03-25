@@ -1,27 +1,24 @@
--- =========================
--- SQLi-Arena: Oracle Lab 5
--- Error -- CTXSYS.DRITHSX.SN
--- =========================
--- Run as SYSDBA:
--- CREATE USER sqli_arena_oracle_lab5 IDENTIFIED BY sqli_arena_2026;
--- GRANT CONNECT, RESOURCE TO sqli_arena_oracle_lab5;
--- Connect as lab user:
+-- Oracle Lab 5: Error-Based CTXSYS.DRITHSX.SN
+-- Tables: employees (id, name, department), hidden_table (id, secret)
 
 CREATE TABLE employees (
     id         NUMBER PRIMARY KEY,
-    name       VARCHAR2(100) NOT NULL,
-    department VARCHAR2(50)  NOT NULL,
-    salary     NUMBER(10,2)  NOT NULL
+    name       VARCHAR2(200) NOT NULL,
+    department VARCHAR2(100)
 );
 
-INSERT INTO employees VALUES (1, 'Alice Johnson',  'Engineering', 95000.00);
-INSERT INTO employees VALUES (2, 'Bob Smith',      'Marketing',   72000.00);
-INSERT INTO employees VALUES (3, 'Carol Williams', 'Finance',     88000.00);
+INSERT INTO employees (id, name, department) VALUES (1, 'John Smith', 'Engineering');
+INSERT INTO employees (id, name, department) VALUES (2, 'Jane Doe', 'Engineering');
+INSERT INTO employees (id, name, department) VALUES (3, 'Mike Wilson', 'Marketing');
+INSERT INTO employees (id, name, department) VALUES (4, 'Sarah Connor', 'Finance');
+INSERT INTO employees (id, name, department) VALUES (5, 'Tom Brown', 'HR');
 
-CREATE TABLE admin_secrets (
+CREATE TABLE hidden_table (
     id     NUMBER PRIMARY KEY,
-    secret VARCHAR2(100) NOT NULL
+    secret VARCHAR2(200)
 );
 
-INSERT INTO admin_secrets VALUES (1, 'FLAG{or_ctxsys_dr1thsx}');
+INSERT INTO hidden_table (id, secret) VALUES (1, 'FLAG{or_ctxsys_dr1thsx}');
+
 COMMIT;
+EXIT;

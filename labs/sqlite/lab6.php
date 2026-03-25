@@ -3,12 +3,12 @@ require_once __DIR__ . '/../../includes/db.php';
 $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = $conn->querySingle("SELECT config_value FROM system_config WHERE config_key = 'master_flag' LIMIT 1");
     if ($res && $submitted === $res) {
         $_SESSION['sqlite_lab6_solved'] = true;
-        header("Location: " . url_lab_from_slug("sqlite/lab6", $mode));
+        header("Location: " . url_lab_from_slug("sqlite/lab6", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -17,11 +17,11 @@ if (isset($_POST['flag_field'])) {
 ?>
 
 <div class="card">
-    <h3>Lab 6: typeof() / zeroblob() Tricks</h3>
+    <h3>Lab 6. typeof() / zeroblob() Tricks</h3>
 
     <h4>Scenario</h4>
     <p>
-        The Data Viewer application lets you look up data entries by their ID. The developer
+        A data viewer application lets you look up data entries by their ID. The developer
         implemented a "type check": the input is validated using SQLite's <code>typeof()</code>
         function to ensure it is an integer. However, the validation is flawed.
     </p>
@@ -42,12 +42,12 @@ if (isset($_POST['flag_field'])) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-        <button type="submit" class="btn btn-primary">Submit Flag</button>
+        <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+        <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
     <?php if ($verify_error): ?>
@@ -83,7 +83,7 @@ if (isset($_POST['flag_field'])) {
         $type_result = @$conn->querySingle($type_check);
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Type Check Query</span></div>';
             echo '<div class="terminal-body"><span class="prompt">SQL: </span>' . htmlspecialchars($type_check) . '</div>';
             echo '</div>';
@@ -101,7 +101,7 @@ if (isset($_POST['flag_field'])) {
         $query = "SELECT id, label, value FROM data_entries WHERE id = $input";
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Executed Query</span></div>';
             echo '<div class="terminal-body"><span class="prompt">SQL: </span>' . htmlspecialchars($query) . '</div>';
             echo '</div>';

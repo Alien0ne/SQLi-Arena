@@ -3,9 +3,9 @@
 # SQLi-Arena -- Full Installation Script
 # Clone, run this, and everything is ready.
 #
+# Supported: Kali Linux, Ubuntu 22.04/24.04, Debian 12/13
 # Usage: sudo bash install.sh
 # ============================================================
-set -e
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -37,20 +37,35 @@ fi
 # Detect the real user (not root) for ownership
 REAL_USER="${SUDO_USER:-$(whoami)}"
 
+export DEBIAN_FRONTEND=noninteractive
+
+# Detect distro
+DISTRO_ID=$(. /etc/os-release 2>/dev/null && echo "$ID")
+DISTRO_CODENAME=$(. /etc/os-release 2>/dev/null && echo "$VERSION_CODENAME")
+
 # ============================================================
 # Step 1: Install system packages
 # ============================================================
 echo -e "${YELLOW}[1/10] Installing system packages...${NC}"
 
-export DEBIAN_FRONTEND=noninteractive
-
 # Determine PHP version available
+echo -e "  [*] Updating package list..."
+apt-get update -qq 2>&1 | tail -1
+
 PHP_VER=$(apt-cache show php 2>/dev/null | grep -oP 'Depends:.*php\K[0-9]+\.[0-9]+' | head -1)
 if [[ -z "$PHP_VER" ]]; then
     PHP_VER="8.2"
 fi
 
+# Detect MySQL vs MariaDB (Debian 13+ and Kali only have mariadb-server)
+MYSQL_PKG="mysql-server"
+MYSQL_CANDIDATE=$(apt-cache policy mysql-server 2>/dev/null | grep 'Candidate:' | awk '{print $2}')
+if [[ -z "$MYSQL_CANDIDATE" || "$MYSQL_CANDIDATE" == "(none)" ]]; then
+    MYSQL_PKG="mariadb-server"
+fi
+
 PACKAGES=(
+    git
     apache2
     libapache2-mod-php
     "php${PHP_VER}"
@@ -63,16 +78,18 @@ PACKAGES=(
     "php${PHP_VER}-xml"
     "php${PHP_VER}-dev"
     php-pear
-    mysql-server
+    "$MYSQL_PKG"
+    mariadb-client
     postgresql
     sqlite3
     curl
+    ca-certificates
+    gnupg
+    lsb-release
+    build-essential
+    unixodbc-dev
     docker.io
-    docker-compose-plugin
 )
-
-echo -e "  [*] Updating package list..."
-apt-get update -qq 2>&1 | tail -1
 
 echo -e "  [*] Installing packages (this may take a few minutes)..."
 for pkg in "${PACKAGES[@]}"; do
@@ -87,7 +104,80 @@ done
 echo -e "  ${GREEN}All system packages installed.${NC}"
 
 # ============================================================
-# Step 2: Install optional PHP extensions (PECL)
+# Step 1b: Docker official repo (compose plugin + buildx)
+# ============================================================
+# docker.io from distro repos may have old buildx or no compose plugin.
+# Add Docker's official repo for compose-plugin and buildx-plugin.
+
+setup_docker_repo() {
+    echo -e "  [*] Adding Docker official repository..."
+    install -m 0755 -d /etc/apt/keyrings
+
+    # Determine the correct Docker repo distro and codename
+    local docker_distro="$DISTRO_ID"
+    local docker_codename="$DISTRO_CODENAME"
+
+    case "$DISTRO_ID" in
+        kali)
+            docker_distro="debian"
+            docker_codename="bookworm"
+            ;;
+        debian)
+            # Debian 13 (trixie) may not have a Docker repo yet; fall back to bookworm
+            if ! curl -sf "https://download.docker.com/linux/debian/dists/${docker_codename}/Release" &>/dev/null; then
+                docker_codename="bookworm"
+            fi
+            ;;
+        ubuntu)
+            # Ubuntu codenames are usually supported directly
+            ;;
+        *)
+            # Unknown distro, try debian bookworm as safe default
+            docker_distro="debian"
+            docker_codename="bookworm"
+            ;;
+    esac
+
+    curl -fsSL "https://download.docker.com/linux/${docker_distro}/gpg" | gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>/dev/null || true
+    chmod a+r /etc/apt/keyrings/docker.gpg 2>/dev/null || true
+
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${docker_distro} ${docker_codename} stable" \
+        > /etc/apt/sources.list.d/docker.list
+
+    apt-get update -qq 2>&1 | tail -1
+}
+
+# Install docker-compose-plugin if not available
+if ! docker compose version &>/dev/null; then
+    setup_docker_repo
+    apt-get install -y -qq docker-compose-plugin 2>&1 | tail -3 || echo -e "  ${YELLOW}[!]${NC} docker-compose-plugin install failed"
+fi
+
+# Upgrade docker-buildx if too old (compose build needs >= 0.17)
+BUILDX_VER=$(docker buildx version 2>/dev/null | grep -oP '[0-9]+\.[0-9]+' | head -1)
+if [[ -z "$BUILDX_VER" ]] || awk "BEGIN{exit ($BUILDX_VER >= 0.17) ? 1 : 0}"; then
+    echo -e "  [*] Upgrading docker-buildx..."
+    # Remove old distro buildx if it conflicts
+    dpkg --remove --force-depends docker-buildx 2>/dev/null || true
+    if [[ ! -f /etc/apt/sources.list.d/docker.list ]]; then
+        setup_docker_repo
+    fi
+    apt-get install -y -qq docker-buildx-plugin 2>&1 | tail -3 || echo -e "  ${YELLOW}[!]${NC} docker-buildx-plugin install failed"
+fi
+
+if docker compose version &>/dev/null; then
+    echo -e "  ${GREEN}[+]${NC} docker compose v2 available"
+elif command -v docker-compose &>/dev/null; then
+    echo -e "  ${GREEN}[+]${NC} docker-compose v1 available"
+else
+    echo -e "  ${YELLOW}[!]${NC} No docker compose found — Docker containers may not start"
+fi
+
+BUILDX_FINAL=$(docker buildx version 2>/dev/null | head -1)
+echo -e "  ${GREEN}[+]${NC} docker buildx: $BUILDX_FINAL"
+
+# ============================================================
+# Step 2: Install PHP extensions
 # ============================================================
 echo ""
 echo -e "${YELLOW}[2/10] Installing PHP extensions for all engines...${NC}"
@@ -95,31 +185,52 @@ echo -e "${YELLOW}[2/10] Installing PHP extensions for all engines...${NC}"
 PHP_VER_DETECTED=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;" 2>/dev/null)
 echo -e "  ${GREEN}[+]${NC} PHP version: $PHP_VER_DETECTED"
 
-install_pecl_ext() {
+install_php_ext() {
     local ext="$1"
     if php -m 2>/dev/null | grep -qi "^${ext}$"; then
         echo -e "  ${GREEN}[+]${NC} php-$ext already installed"
         return 0
     fi
-    echo -e "  [*] Installing php-$ext via pecl..."
+    # Try apt package first (much faster than PECL)
+    local apt_pkg="php${PHP_VER_DETECTED}-${ext}"
+    if apt-get install -y -qq "$apt_pkg" 2>/dev/null; then
+        echo -e "  ${GREEN}[+]${NC} php-$ext installed via apt"
+        return 0
+    fi
+    # Fall back to PECL (compiles from source — slower)
+    echo -e "  [*] Installing php-$ext via pecl (this may take a few minutes)..."
     pecl install "$ext" 2>&1 | tail -3 || { echo -e "  ${YELLOW}[!]${NC} pecl install $ext failed (non-fatal)"; return 0; }
     for ini_dir in /etc/php/${PHP_VER_DETECTED}/cli/conf.d /etc/php/${PHP_VER_DETECTED}/apache2/conf.d /etc/php/${PHP_VER_DETECTED}/fpm/conf.d; do
         if [[ -d "$ini_dir" ]]; then
             echo "extension=${ext}.so" > "$ini_dir/30-${ext}.ini"
         fi
     done
-    echo -e "  ${GREEN}[+]${NC} php-$ext installed"
+    echo -e "  ${GREEN}[+]${NC} php-$ext installed via pecl"
 }
 
 # MongoDB driver
-install_pecl_ext mongodb
+install_php_ext mongodb
 
 # Redis driver
-install_pecl_ext redis
+install_php_ext redis
 
-# MSSQL PDO driver
+# MSSQL PDO driver (requires Microsoft ODBC)
 if ! php -m 2>/dev/null | grep -qi "pdo_sqlsrv"; then
     echo -e "  [*] Installing MSSQL drivers (sqlsrv + pdo_sqlsrv)..."
+
+    # Install Microsoft ODBC driver first (required for sqlsrv/pdo_sqlsrv)
+    if ! dpkg -l msodbcsql18 2>/dev/null | grep -q "^ii"; then
+        echo -e "  [*] Installing Microsoft ODBC driver..."
+        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg 2>/dev/null || true
+        chmod a+r /usr/share/keyrings/microsoft-prod.gpg 2>/dev/null || true
+
+        # Use Debian 12 (bookworm) repo — works for Kali and Debian
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
+            > /etc/apt/sources.list.d/mssql-release.list 2>/dev/null || true
+        apt-get update -qq 2>&1 | tail -1
+        ACCEPT_EULA=Y apt-get install -y -qq msodbcsql18 2>&1 | tail -3 || echo -e "  ${YELLOW}[!]${NC} ODBC driver install failed"
+    fi
+
     pecl install sqlsrv 2>&1 | tail -3 || true
     pecl install pdo_sqlsrv 2>&1 | tail -3 || true
     for ini_dir in /etc/php/${PHP_VER_DETECTED}/cli/conf.d /etc/php/${PHP_VER_DETECTED}/apache2/conf.d; do
@@ -133,10 +244,29 @@ else
     echo -e "  ${GREEN}[+]${NC} php-pdo_sqlsrv already installed"
 fi
 
-# OCI8 for Oracle (optional, requires Oracle Instant Client)
+# OCI8 for Oracle (requires Oracle Instant Client from Kali repos)
 if ! php -m 2>/dev/null | grep -qi "oci8"; then
-    echo -e "  ${YELLOW}[!]${NC} OCI8 not available. Oracle labs require Oracle Instant Client."
-    echo -e "      See: https://www.php.net/manual/en/oci8.installation.php"
+    if apt-cache show oracle-instantclient-basic &>/dev/null && apt-cache show oracle-instantclient-devel &>/dev/null; then
+        echo -e "  [*] Installing Oracle Instant Client and OCI8..."
+        apt-get install -y oracle-instantclient-basic oracle-instantclient-devel 2>&1 | tail -1 || true
+        OCI_LIB=$(find /usr/lib/oracle -name "libclntsh.so" 2>/dev/null | head -1)
+        if [[ -n "$OCI_LIB" ]]; then
+            OCI_DIR=$(dirname "$OCI_LIB")
+            echo "instantclient,$OCI_DIR" | pecl install oci8 2>&1 | tail -2 || true
+            if [[ -f "$(php -r 'echo ini_get("extension_dir");' 2>/dev/null)/oci8.so" ]]; then
+                echo "extension=oci8.so" > "/etc/php/${PHP_VER_DETECTED}/mods-available/oci8.ini"
+                ln -sf "/etc/php/${PHP_VER_DETECTED}/mods-available/oci8.ini" "/etc/php/${PHP_VER_DETECTED}/cli/conf.d/20-oci8.ini" 2>/dev/null || true
+                ln -sf "/etc/php/${PHP_VER_DETECTED}/mods-available/oci8.ini" "/etc/php/${PHP_VER_DETECTED}/apache2/conf.d/20-oci8.ini" 2>/dev/null || true
+                echo -e "  ${GREEN}[+]${NC} OCI8 installed (Oracle Instant Client)"
+            else
+                echo -e "  ${YELLOW}[!]${NC} OCI8 PECL compilation failed. Oracle labs will run in simulation mode."
+            fi
+        else
+            echo -e "  ${YELLOW}[!]${NC} Oracle Instant Client library not found. Oracle labs will run in simulation mode."
+        fi
+    else
+        echo -e "  ${YELLOW}[!]${NC} Oracle Instant Client not in repos. Oracle labs will run in simulation mode."
+    fi
 else
     echo -e "  ${GREEN}[+]${NC} php-oci8 already installed"
 fi
@@ -149,13 +279,13 @@ echo -e "  ${GREEN}PHP extensions ready.${NC}"
 echo ""
 echo -e "${YELLOW}[3/10] Starting system services...${NC}"
 
-# MySQL
+# MySQL / MariaDB
 if systemctl is-active --quiet mysql 2>/dev/null || systemctl is-active --quiet mariadb 2>/dev/null; then
     echo -e "  ${GREEN}[+]${NC} MySQL/MariaDB already running"
 else
-    systemctl start mysql 2>/dev/null || systemctl start mariadb 2>/dev/null || echo -e "  ${YELLOW}[!]${NC} Could not start MySQL"
+    systemctl start mysql 2>/dev/null || systemctl start mariadb 2>/dev/null || echo -e "  ${YELLOW}[!]${NC} Could not start MySQL/MariaDB"
     systemctl enable mysql 2>/dev/null || systemctl enable mariadb 2>/dev/null || true
-    echo -e "  ${GREEN}[+]${NC} MySQL started"
+    echo -e "  ${GREEN}[+]${NC} MySQL/MariaDB started"
 fi
 
 # PostgreSQL
@@ -176,7 +306,6 @@ else
     echo -e "  ${GREEN}[+]${NC} Docker started"
 fi
 
-# Apache (start later after config)
 echo -e "  ${GREEN}System services ready.${NC}"
 
 # ============================================================
@@ -211,7 +340,8 @@ echo -e "  ${GREEN}Apache configured and running.${NC}"
 # Step 5: Start Docker containers
 # ============================================================
 echo ""
-echo -e "${YELLOW}[5/10] Starting Docker containers (MSSQL, Oracle, MongoDB, Redis, HQL, GraphQL)...${NC}"
+echo -e "${YELLOW}[5/10] Starting Docker containers (MSSQL, MSSQL-Internal, Oracle, MongoDB, Redis, HQL, GraphQL)...${NC}"
+echo -e "  ${CYAN}This pulls ~3GB of images on first run. Please be patient...${NC}"
 
 cd "$SCRIPT_DIR"
 
@@ -222,7 +352,17 @@ else
     COMPOSE_CMD="docker-compose"
 fi
 
-$COMPOSE_CMD up -d --build 2>&1 | grep -E "Created|Started|Building|Pulling|running|done" || true
+# Pull images first (so build doesn't timeout)
+echo -e "  [*] Pulling Docker images..."
+$COMPOSE_CMD pull 2>&1 | grep -E "Pulled|Pulling|done|Downloaded" | tail -10 || true
+
+# Build custom images (HQL, GraphQL)
+echo -e "  [*] Building custom images (HQL, GraphQL)..."
+$COMPOSE_CMD build 2>&1 | tail -5 || true
+
+# Start all containers
+echo -e "  [*] Starting containers..."
+$COMPOSE_CMD up -d 2>&1 | grep -E "Created|Started|Running|running" || true
 echo -e "  ${GREEN}Docker containers starting.${NC}"
 
 # ============================================================
@@ -245,14 +385,15 @@ wait_for() {
     return 0
 }
 
-wait_for "MySQL"     "mysql -u root -e 'SELECT 1' 2>/dev/null || mysqladmin ping -u root 2>/dev/null" 20
-wait_for "PostgreSQL" "su - postgres -c 'psql -c \"SELECT 1\"' 2>/dev/null" 20
-wait_for "MongoDB"   "docker exec sqli-arena-mongodb mongosh --username sqli_arena --password sqli_arena_2026 --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")' --quiet" 30
-wait_for "Redis"     "docker exec sqli-arena-redis redis-cli -a sqli_arena_2026 --no-auth-warning ping | grep -q PONG" 20
-wait_for "MSSQL"     "docker exec sqli-arena-mssql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'SqliArena2026!' -C -Q 'SELECT 1' -b -o /dev/null" 60
-wait_for "Oracle"    "docker exec sqli-arena-oracle healthcheck.sh" 90
-wait_for "HQL API"   "curl -sf http://localhost:8081/actuator/health" 60
-wait_for "GraphQL"   "curl -sf http://localhost:4000/health" 30
+wait_for "MySQL"      "mysql -u root -e 'SELECT 1' 2>/dev/null || mysqladmin ping -u root 2>/dev/null" 20
+wait_for "PostgreSQL"  "su - postgres -c 'psql -c \"SELECT 1\"' 2>/dev/null" 20
+wait_for "MongoDB"    "docker exec sqli-arena-mongodb mongosh --username sqli_arena --password sqli_arena_2026 --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")' --quiet" 40
+wait_for "Redis"      "docker exec sqli-arena-redis redis-cli -a sqli_arena_2026 --no-auth-warning ping | grep -q PONG" 30
+wait_for "MSSQL"      "docker exec sqli-arena-mssql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'SqliArena2026!' -C -Q 'SELECT 1' -b -o /dev/null" 80
+wait_for "MSSQL (B)"  "docker exec sqli-arena-mssql-internal /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Internal2026!' -C -Q 'SELECT 1' -b -o /dev/null" 80
+wait_for "Oracle"     "docker exec sqli-arena-oracle healthcheck.sh" 120
+wait_for "HQL API"    "curl -sf http://localhost:8081/actuator/health" 80
+wait_for "GraphQL"    "curl -sf http://localhost:4000/health" 40
 
 echo -e "  ${GREEN}All services ready.${NC}"
 
@@ -290,11 +431,16 @@ echo -e "  ${GREEN}All lab databases initialized.${NC}"
 echo ""
 echo -e "${YELLOW}[8/10] Deploying to web root...${NC}"
 
-# Remove old deployment
-rm -rf "$WEBROOT"
+# Resolve both paths to handle symlinks/trailing slashes
+RESOLVED_SCRIPT="$(cd "$SCRIPT_DIR" && pwd -P)"
+RESOLVED_WEBROOT="$(cd "$(dirname "$WEBROOT")" && pwd -P)/$(basename "$WEBROOT")"
 
-# Copy project
-cp -r "$SCRIPT_DIR" "$WEBROOT"
+if [[ "$RESOLVED_SCRIPT" == "$RESOLVED_WEBROOT" ]]; then
+    echo -e "  ${CYAN}[i]${NC} Already running from $WEBROOT -- skipping copy"
+else
+    rm -rf "$WEBROOT"
+    cp -r "$SCRIPT_DIR" "$WEBROOT"
+fi
 
 # Create data directories
 mkdir -p "$WEBROOT/data/sqlite" "$WEBROOT/data/tasks"
@@ -308,6 +454,29 @@ chmod -R 755 "$WEBROOT"
 chmod -R 777 "$WEBROOT/data"
 
 echo -e "  ${GREEN}[+]${NC} Deployed to $WEBROOT"
+
+# Build setuid cleanup helper so the web UI can run cleanup.sh as root
+# (sudo from Apache is blocked by use_pty on most systems)
+HELPER_SRC=$(mktemp /tmp/sqli_cleanup_helper.XXXXXX.c)
+cat > "$HELPER_SRC" << 'HELPEREOF'
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+int main() {
+    setuid(0);
+    setgid(0);
+    FILE *fp = popen("printf \"y\\nn\\nn\\nn\\n\" | /bin/bash /var/www/html/SQLi-Arena/setup/cleanup.sh 2>&1", "r");
+    if (!fp) { perror("popen"); return 1; }
+    char buf[4096];
+    while (fgets(buf, sizeof(buf), fp)) fputs(buf, stdout);
+    return pclose(fp) >> 8;
+}
+HELPEREOF
+gcc -o /usr/local/bin/sqli-arena-cleanup "$HELPER_SRC" 2>/dev/null
+chown root:root /usr/local/bin/sqli-arena-cleanup
+chmod 4755 /usr/local/bin/sqli-arena-cleanup
+rm -f "$HELPER_SRC"
+echo -e "  ${GREEN}[+]${NC} Cleanup helper installed"
 
 # ============================================================
 # Step 9: Configure hostname for Burp Suite
@@ -342,7 +511,7 @@ else
 fi
 
 # Check a lab loads
-if curl -sf "http://localhost/SQLi-Arena/mysql/lab1" 2>/dev/null | grep -qi "lab 1"; then
+if curl -sf "http://localhost/SQLi-Arena/mysql/lab1" 2>/dev/null | grep -qi "lab"; then
     echo -e "  ${GREEN}[+]${NC} Lab pages are working"
 else
     echo -e "  ${YELLOW}[!]${NC} Lab pages may not be loading (check mod_rewrite)"
@@ -350,7 +519,7 @@ fi
 
 # Check Docker containers
 RUNNING=$(docker ps --filter "name=sqli-arena" --format '{{.Names}}' 2>/dev/null | wc -l)
-echo -e "  ${GREEN}[+]${NC} $RUNNING Docker containers running"
+echo -e "  ${GREEN}[+]${NC} $RUNNING/7 Docker containers running"
 
 # ============================================================
 # Done!
@@ -372,7 +541,8 @@ echo ""
 echo -e "  ${BOLD}Services:${NC}"
 echo -e "    MySQL/MariaDB   ${CYAN}localhost:3306${NC}"
 echo -e "    PostgreSQL      ${CYAN}localhost:5432${NC}"
-echo -e "    MSSQL           ${CYAN}localhost:1433${NC}"
+echo -e "    MSSQL (A)       ${CYAN}localhost:1433${NC}"
+echo -e "    MSSQL (B)       ${CYAN}localhost:1434${NC}  (internal linked server)"
 echo -e "    Oracle          ${CYAN}localhost:1521${NC}"
 echo -e "    MongoDB         ${CYAN}localhost:27017${NC}"
 echo -e "    Redis           ${CYAN}localhost:6379${NC}"
@@ -380,8 +550,17 @@ echo -e "    HQL API         ${CYAN}localhost:8081${NC}"
 echo -e "    GraphQL API     ${CYAN}localhost:4000${NC}"
 echo ""
 echo -e "  ${BOLD}Management:${NC}"
-echo -e "    Control Panel:    ${CYAN}http://localhost/SQLi-Arena/admin${NC}"
+echo -e "    Control Panel:    ${CYAN}http://localhost/SQLi-Arena/control-panel${NC}"
 echo -e "    Stop containers:  ${CYAN}bash setup/docker_stop.sh${NC}"
 echo -e "    Start containers: ${CYAN}bash setup/docker_start.sh${NC}"
 echo -e "    Full cleanup:     ${CYAN}sudo bash setup/cleanup.sh${NC}"
 echo ""
+
+if [[ $RUNNING -lt 7 ]]; then
+    echo -e "  ${YELLOW}Note: Some Docker containers may still be starting.${NC}"
+    echo -e "  ${YELLOW}Run 'sudo docker ps' to check status. If containers are${NC}"
+    echo -e "  ${YELLOW}still pulling images, wait a few minutes then run:${NC}"
+    echo -e "    ${CYAN}cd $(pwd) && sudo docker compose up -d${NC}"
+    echo -e "    ${CYAN}sudo bash setup.sh${NC}"
+    echo ""
+fi

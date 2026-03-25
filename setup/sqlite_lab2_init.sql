@@ -1,23 +1,23 @@
-DROP TABLE IF EXISTS employees;
-DROP TABLE IF EXISTS hidden_data;
+-- SQLite Lab 2: UNION - pragma_table_info() Enumeration
+-- Tables: employees, hidden_data
 
-CREATE TABLE employees (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    department TEXT
+CREATE TABLE IF NOT EXISTS employees (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    department TEXT NOT NULL
 );
 
-CREATE TABLE hidden_data (
-    id INTEGER PRIMARY KEY,
-    secret_flag TEXT,
-    notes TEXT
+CREATE TABLE IF NOT EXISTS hidden_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    secret_flag TEXT NOT NULL
 );
 
-INSERT INTO employees (id, name, department) VALUES (1, 'Alice Johnson', 'Engineering');
-INSERT INTO employees (id, name, department) VALUES (2, 'Bob Williams', 'Marketing');
-INSERT INTO employees (id, name, department) VALUES (3, 'Carol Davis', 'Finance');
-INSERT INTO employees (id, name, department) VALUES (4, 'David Brown', 'Engineering');
-INSERT INTO employees (id, name, department) VALUES (5, 'Eve Wilson', 'HR');
+INSERT INTO employees (name, department) VALUES ('Alice Johnson', 'Engineering');
+INSERT INTO employees (name, department) VALUES ('Bob Smith', 'Marketing');
+INSERT INTO employees (name, department) VALUES ('Carol Williams', 'Finance');
+INSERT INTO employees (name, department) VALUES ('David Brown', 'Engineering');
+INSERT INTO employees (name, department) VALUES ('Eve Davis', 'Human Resources');
 
-INSERT INTO hidden_data (id, secret_flag, notes) VALUES (1, 'FLAG{sq_pr4gm4_t4bl3_1nf0}', 'This is the master flag');
-INSERT INTO hidden_data (id, notes, secret_flag) VALUES (2, 'Decoy entry', 'not_a_flag');
+INSERT INTO hidden_data (secret_flag) VALUES ('FLAG{sl_pr4gm4_t4bl3_1nf0}');
+INSERT INTO hidden_data (secret_flag) VALUES ('decoy_not_a_flag_abc123');
+INSERT INTO hidden_data (secret_flag) VALUES ('decoy_not_a_flag_def456');

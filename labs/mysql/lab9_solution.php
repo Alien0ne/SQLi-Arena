@@ -181,8 +181,8 @@
         <span class="terminal-title">Step 8. Python Automation (lab9_blind_boolean.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab9_blind_boolean.py http://localhost/SQLi-Arena/<br><br>
-        <span class="prompt">[*] </span>Target: http://localhost/SQLi-Arena/<br>
+        <span class="prompt">$ </span>python3 scripts/lab9_blind_boolean.py http://localhost/SQLi-Arena<br><br>
+        <span class="prompt">[*] </span>Target: http://localhost/SQLi-Arena/mysql/lab9<br>
         <span class="prompt">[*] </span>Confirming boolean oracle...<br>
         <span class="prompt">[+] </span>Boolean oracle confirmed (TRUE=active, FALSE=not found)<br>
         <span class="prompt">[*] </span>Finding flag length...<br>

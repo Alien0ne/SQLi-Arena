@@ -4,24 +4,22 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
-    if ($submitted === 'FLAG{or_xmltyp3_3rr0r}') {
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
+    $flag_sql = "SELECT password FROM users WHERE username='admin'";
+    $flag_stmt = oci_parse($conn, $flag_sql);
+    oci_execute($flag_stmt);
+    $flag_row = oci_fetch_assoc($flag_stmt);
+    if ($flag_row && $submitted === $flag_row['PASSWORD']) {
         $_SESSION['oracle_lab3_solved'] = true;
-        header("Location: " . url_lab_from_slug("oracle/lab3", $mode));
+        header("Location: " . url_lab_from_slug("oracle/lab3", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Simulation Mode</strong>: <?= htmlspecialchars($driver_missing) ?> driver not installed.
-    Query construction shown for learning. Install the driver for live execution.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -29,15 +27,11 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This login form does not display query results directly: it only shows
-        "Login Successful" or "Login Failed". However, Oracle error messages are displayed
-        when a query fails. By abusing the <code>XMLType()</code> constructor, you can force
-        Oracle to embed query results inside an XML parsing error.
+        A login form does not display query results directly — it only shows "Login Successful"
+        or "Login Failed". However, Oracle error messages are displayed when a query fails.
+        The <code>XMLType()</code> constructor attempts to parse a string as XML, and if parsing
+        fails, the error message includes the offending string value.
     </p>
-    <p><strong>Oracle Concepts:</strong> <code>XMLType()</code> attempts to parse a string as XML.
-    If the string is not valid XML, the error message includes the offending string value --
-    leaking your subquery results.</p>
-    <p><strong>Table Schema:</strong> <code>users(id NUMBER, username VARCHAR2, password VARCHAR2, role VARCHAR2)</code></p>
 
     <h4>Objective</h4>
     <p>
@@ -59,7 +53,7 @@ if (isset($_POST['flag_input'])) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="FLAG{...}" required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -98,7 +92,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     $query = "SELECT id, username, role FROM users WHERE username = '$username' AND password = '$password'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">Oracle Query</span>';
@@ -127,8 +121,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         }
 }
     } else {
-        echo '<div class="result-warning result-box">';
-        echo '<strong>Simulation Mode:</strong> Query shown above for learning. Install the OCI8 driver for live results.';
+        echo '<div class="result-error result-box">';
+        echo '<strong>Error:</strong> Database connection failed. Is the Oracle container running?';
         echo '</div>';
     }
 }

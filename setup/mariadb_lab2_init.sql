@@ -3,8 +3,7 @@
 -- CONNECT Engine -- Remote Tables
 -- ================================
 
-DROP DATABASE IF EXISTS sqli_arena_mariadb_lab2;
-CREATE DATABASE sqli_arena_mariadb_lab2;
+CREATE DATABASE IF NOT EXISTS sqli_arena_mariadb_lab2;
 USE sqli_arena_mariadb_lab2;
 
 DROP TABLE IF EXISTS products;
@@ -26,8 +25,7 @@ INSERT INTO products (name, price) VALUES
 ('CONNECT Engine Plugin', 299.99),
 ('Spider Engine Module', 499.99),
 ('Galera Cluster Pack', 1999.99),
-('MaxScale Proxy', 799.99),
-('ColumnStore Analytics', 3499.99);
+('MaxScale Proxy', 799.99);
 
 INSERT INTO engine_secrets (secret_value) VALUES
-('FLAG{ma_c0nn3ct_3ng1n3_r34d}');
+('FLAG{ma_c0nn3ct_3ng1n3_csv}');

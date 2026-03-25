@@ -9,11 +9,11 @@ $verify_error = null;
    =========================== */
 
 // Flag verification
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{rd_crlf_pr0t0c0l_1nj}') {
         $_SESSION['redis_lab1_solved'] = true;
-        header("Location: " . url_lab_from_slug("redis/lab1", $mode));
+        header("Location: " . url_lab_from_slug("redis/lab1", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -138,12 +138,12 @@ function redisCrlfSend($key, $userValue) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-        <button type="submit" class="btn btn-primary">Submit Flag</button>
+        <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+        <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
     <?php if ($verify_error): ?>
@@ -177,7 +177,7 @@ function redisCrlfSend($key, $userValue) {
         $userValue = $_POST['value'];
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Protocol Construction</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">Raw protocol: </span>SET ' . htmlspecialchars($userKey) . ' ' . htmlspecialchars($userValue) . "\n";
@@ -190,7 +190,7 @@ function redisCrlfSend($key, $userValue) {
         // Send via raw socket: vulnerable to CRLF injection
         $log = redisCrlfSend($userKey, $userValue);
 
-        echo '<div class="terminal">';
+        echo '<div class="terminal query-output">';
         echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Redis Response</span></div>';
         echo '<div class="terminal-body">';
 
@@ -225,7 +225,7 @@ function redisCrlfSend($key, $userValue) {
             $fullKey = $redisPrefix . $lookupKey;
             $result = $conn->get($fullKey);
             $display = ($result === false) ? '(nil)' : $result;
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Redis Response</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">redis> </span>GET ' . htmlspecialchars($lookupKey) . "<br>";

@@ -8,11 +8,11 @@ $verify_error = null;
    Real Redis for data, simulated CONFIG SET dir/dbfilename/BGSAVE
    =========================== */
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{rd_c0nf1g_s3t_wr1t3}') {
         $_SESSION['redis_lab3_solved'] = true;
-        header("Location: " . url_lab_from_slug("redis/lab3", $mode));
+        header("Location: " . url_lab_from_slug("redis/lab3", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -149,7 +149,7 @@ function lab3Execute($rawCmd, $conn, $prefix, &$config) {
 
     <h4>Scenario</h4>
     <p>
-        The Redis Admin Panel provides a command interface for managing the Redis server.
+        A Redis admin panel provides a command interface for managing the Redis server.
         The panel is misconfigured and allows unauthenticated access to CONFIG commands.
     </p>
 
@@ -172,12 +172,12 @@ function lab3Execute($rawCmd, $conn, $prefix, &$config) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-        <button type="submit" class="btn btn-primary">Submit Flag</button>
+        <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+        <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
     <?php if ($verify_error): ?>
@@ -212,7 +212,7 @@ function lab3Execute($rawCmd, $conn, $prefix, &$config) {
         $log = $execResult['log'];
         $writtenFiles = $execResult['writtenFiles'];
 
-        echo '<div class="terminal">';
+        echo '<div class="terminal query-output">';
         echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Redis Console</span></div>';
         echo '<div class="terminal-body">';
 
@@ -225,7 +225,7 @@ function lab3Execute($rawCmd, $conn, $prefix, &$config) {
 
         // Show file write details if SAVE was executed
         if (!empty($writtenFiles)) {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">File System Activity</span></div>';
             echo '<div class="terminal-body">';
             foreach ($writtenFiles as $wf) {

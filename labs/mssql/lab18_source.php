@@ -26,5 +26,5 @@ try {
         echo "Asset: {$row['asset_name']} | Type: {$row['asset_type']} | Location: {$row['location']}";
     }
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

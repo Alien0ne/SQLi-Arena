@@ -1,29 +1,24 @@
--- =========================
--- SQLi-Arena: Oracle Lab 9
--- OOB -- UTL_HTTP.REQUEST
--- =========================
--- Run as SYSDBA:
--- CREATE USER sqli_arena_oracle_lab9 IDENTIFIED BY sqli_arena_2026;
--- GRANT CONNECT, RESOURCE TO sqli_arena_oracle_lab9;
--- GRANT EXECUTE ON UTL_HTTP TO sqli_arena_oracle_lab9;
--- BEGIN DBMS_NETWORK_ACL_ADMIN.CREATE_ACL(...); END; -- for network access
--- Connect as lab user:
+-- Oracle Lab 9: Out-of-Band UTL_HTTP.REQUEST
+-- Tables: documents (id, title, author), oob_secrets (id, secret)
 
 CREATE TABLE documents (
-    id      NUMBER PRIMARY KEY,
-    title   VARCHAR2(200) NOT NULL,
-    author  VARCHAR2(100) NOT NULL,
-    content CLOB          NOT NULL
+    id     NUMBER PRIMARY KEY,
+    title  VARCHAR2(300),
+    author VARCHAR2(200)
 );
 
-INSERT INTO documents VALUES (1, 'Annual Report 2025',  'Finance Team', 'Financial performance summary...');
-INSERT INTO documents VALUES (2, 'Product Roadmap',     'Engineering',  'Upcoming features and timelines...');
-INSERT INTO documents VALUES (3, 'Security Policy',     'InfoSec',      'Internal security guidelines...');
+INSERT INTO documents (id, title, author) VALUES (1, 'Q4 Financial Report', 'Finance Team');
+INSERT INTO documents (id, title, author) VALUES (2, 'Engineering Roadmap 2025', 'Engineering');
+INSERT INTO documents (id, title, author) VALUES (3, 'HR Policy Update', 'HR Department');
+INSERT INTO documents (id, title, author) VALUES (4, 'Security Audit Results', 'Security Team');
+INSERT INTO documents (id, title, author) VALUES (5, 'Marketing Campaign Plan', 'Marketing');
 
 CREATE TABLE oob_secrets (
     id     NUMBER PRIMARY KEY,
-    secret VARCHAR2(100) NOT NULL
+    secret VARCHAR2(200)
 );
 
-INSERT INTO oob_secrets VALUES (1, 'FLAG{or_utl_http_00b}');
+INSERT INTO oob_secrets (id, secret) VALUES (1, 'FLAG{or_utl_http_00b}');
+
 COMMIT;
+EXIT;

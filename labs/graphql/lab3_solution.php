@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     The User API implements rate limiting (3 requests per minute) to prevent OTP brute forcing.
     However, GraphQL aliases allow sending multiple OTP verification attempts in a single

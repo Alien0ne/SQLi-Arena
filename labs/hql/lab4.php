@@ -8,23 +8,17 @@ $verify_error = null;
    Real HQL Spring Boot backend
    =========================== */
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{hq_cr1t3r14_4p1_byp4ss}') {
         $_SESSION['hql_lab4_solved'] = true;
-        header("Location: " . url_lab_from_slug("hql/lab4", $mode));
+        header("Location: " . url_lab_from_slug("hql/lab4", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>HQL Backend Unavailable</strong>: <?= htmlspecialchars($driver_missing) ?> is not running.
-    Start it with: <code>bash setup/docker_start.sh</code>
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
@@ -32,7 +26,7 @@ if (isset($_POST['flag_field'])) {
 
     <h4>Scenario</h4>
     <p>
-        The Order Management system uses Hibernate's Criteria API to build dynamic queries
+        An order management system uses Hibernate's Criteria API to build dynamic queries
         from user filters. The application provides both a structured filter interface and
         an "advanced" raw SQL restriction feature.
     </p>
@@ -54,7 +48,7 @@ if (isset($_POST['flag_field'])) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <?php if (!empty($_SESSION['hql_lab4_solved'])): ?>
@@ -66,8 +60,8 @@ if (isset($_POST['flag_field'])) {
             <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
         <?php endif; ?>
         <form method="POST" class="form-row">
-            <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-            <button type="submit" class="btn btn-primary">Submit Flag</button>
+            <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+            <button type="submit" class="btn btn-primary">Verify</button>
         </form>
     <?php endif; ?>
 </div>
@@ -109,7 +103,7 @@ if (isset($_POST['flag_field'])) {
         $value = $_POST['value'] ?? '';
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Criteria Builder</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">Java: </span>session.createCriteria(' . htmlspecialchars($entityName) . '.class)<br>';
@@ -164,7 +158,7 @@ if (isset($_POST['flag_field'])) {
                 echo '<div class="result-box">No results found.</div>';
             }
         } else {
-            echo '<div class="result-warning result-box">HQL backend is not running. Start it with: <code>bash setup/docker_start.sh</code></div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> HQL backend is not running. Is the Docker container up?</div>';
         }
     }
     ?>
@@ -188,7 +182,7 @@ if (isset($_POST['flag_field'])) {
         $sqlRestriction = $_POST['sql_restriction'];
 
         if ($mode === 'white') {
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Criteria Builder</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">Java: </span>session.createCriteria(Order.class)<br>';
@@ -238,7 +232,7 @@ if (isset($_POST['flag_field'])) {
                 echo '<div class="result-box">No results match the restriction.</div>';
             }
         } else {
-            echo '<div class="result-warning result-box">HQL backend is not running. Start it with: <code>bash setup/docker_start.sh</code></div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> HQL backend is not running. Is the Docker container up?</div>';
         }
     }
     ?>

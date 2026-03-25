@@ -29,5 +29,5 @@ try {
         echo "Customer: {$row['name']} | Email: {$row['email']}";
     }
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

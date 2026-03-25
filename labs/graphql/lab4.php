@@ -14,11 +14,11 @@ if (!isset($_SESSION['graphql_lab4_attempts'])) {
     $_SESSION['graphql_lab4_window_start'] = time();
 }
 
-if (isset($_POST['flag_field'])) {
-    $submitted = trim($_POST['flag_field']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{gq_b4tch1ng_4tt4ck}') {
         $_SESSION['graphql_lab4_solved'] = true;
-        header("Location: " . url_lab_from_slug("graphql/lab4", $mode));
+        header("Location: " . url_lab_from_slug("graphql/lab4", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -29,7 +29,7 @@ if (isset($_POST['flag_field'])) {
 if (isset($_POST['reset_rate'])) {
     $_SESSION['graphql_lab4_attempts'] = 0;
     $_SESSION['graphql_lab4_window_start'] = time();
-    header("Location: " . url_lab_from_slug("graphql/lab4", $mode));
+    header("Location: " . url_lab_from_slug("graphql/lab4", $mode, $_GET['ref'] ?? ''));
     exit;
 }
 
@@ -57,19 +57,13 @@ function graphql_lab4_query($conn, $payload) {
 }
 ?>
 
-<?php if (!empty($driver_missing)): ?>
-<div class="result-warning result-box" style="margin-bottom:16px;">
-    <strong>Backend Unavailable</strong>: <?= htmlspecialchars($driver_missing) ?> is not running.
-    Start the Node.js Apollo Server to use this lab.
-</div>
-<?php endif; ?>
 
 <!-- Lab Description -->
 <div class="card">
     <h3>Lab 4. Batching Attack</h3>
     <h4>Scenario</h4>
     <p>
-        The OTP verification API uses GraphQL. A 4-digit OTP is required to access a
+        An OTP verification API uses GraphQL. A 4-digit OTP is required to access a
         protected resource. The API has rate limiting: <strong>1 attempt per HTTP request</strong>
         with a 60-second cooldown window.
     </p>
@@ -89,7 +83,7 @@ function graphql_lab4_query($conn, $payload) {
     </div>
 </div>
 
-<!-- Flag Verification -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <?php if (!empty($_SESSION['graphql_lab4_solved'])): ?>
@@ -101,8 +95,8 @@ function graphql_lab4_query($conn, $payload) {
             <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
         <?php endif; ?>
         <form method="POST" class="form-row">
-            <input type="text" name="flag_field" placeholder="FLAG{...}" class="input" required>
-            <button type="submit" class="btn btn-primary">Submit Flag</button>
+            <input type="text" name="flag" placeholder="Enter the flag..." class="input" required>
+            <button type="submit" class="btn btn-primary">Verify</button>
         </form>
     <?php endif; ?>
 </div>
@@ -129,7 +123,7 @@ function graphql_lab4_query($conn, $payload) {
     <?php
     if (isset($_POST['execute']) && $_POST['execute'] === 'single' && isset($_POST['otp'])) {
         if (!$conn) {
-            echo '<div class="result-warning result-box"><strong>GraphQL backend is not running.</strong> Start the Node.js Apollo Server at ' . htmlspecialchars(GRAPHQL_API_URL) . ' to use this lab.</div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> GraphQL backend is not running. Is the Docker container up?</div>';
         } else {
             $otp = $_POST['otp'];
 
@@ -139,7 +133,7 @@ function graphql_lab4_query($conn, $payload) {
             $payload = json_encode(['query' => $query]);
             $result = graphql_lab4_query($conn, $payload);
 
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">OTP Result</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">Attempt #' . $_SESSION['graphql_lab4_attempts'] . ': </span>OTP=' . htmlspecialchars($otp) . "<br>";
@@ -169,7 +163,7 @@ function graphql_lab4_query($conn, $payload) {
     <?php
     if (isset($_POST['execute']) && $_POST['execute'] === 'batch' && isset($_POST['query'])) {
         if (!$conn) {
-            echo '<div class="result-warning result-box"><strong>GraphQL backend is not running.</strong> Start the Node.js Apollo Server at ' . htmlspecialchars(GRAPHQL_API_URL) . ' to use this lab.</div>';
+            echo '<div class="result-error result-box"><strong>Error:</strong> GraphQL backend is not running. Is the Docker container up?</div>';
         } else {
             $queryStr = trim($_POST['query']);
 
@@ -187,7 +181,7 @@ function graphql_lab4_query($conn, $payload) {
 
             $result = graphql_lab4_query($conn, $payload);
 
-            echo '<div class="terminal">';
+            echo '<div class="terminal query-output">';
             echo '<div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">Batch Results</span></div>';
             echo '<div class="terminal-body">';
             echo '<span class="prompt">HTTP Requests used: </span>1<br>';

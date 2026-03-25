@@ -1,4 +1,4 @@
-<h4>Overview</h4>
+<!-- Introduction -->
 <p>
     GraphQL introspection is a built-in feature that reveals the entire API schema. When
     enabled in production, attackers can discover hidden types, fields, and relationships

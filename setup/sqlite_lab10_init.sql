@@ -1,21 +1,23 @@
-DROP TABLE IF EXISTS search_data;
-DROP TABLE IF EXISTS hidden_flags;
+-- SQLite Lab 10: WAF Bypass - No Standard Keywords
+-- Tables: search_data, hidden_flags
 
-CREATE TABLE search_data (
-    id INTEGER PRIMARY KEY,
-    keyword TEXT,
-    description TEXT
+CREATE TABLE IF NOT EXISTS search_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    keyword TEXT NOT NULL,
+    description TEXT NOT NULL
 );
 
-CREATE TABLE hidden_flags (
-    id INTEGER PRIMARY KEY,
-    flag_value TEXT
+CREATE TABLE IF NOT EXISTS hidden_flags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    flag_value TEXT NOT NULL
 );
 
-INSERT INTO search_data (id, keyword, description) VALUES (1, 'networking', 'TCP/IP fundamentals and protocols');
-INSERT INTO search_data (id, keyword, description) VALUES (2, 'encryption', 'AES, RSA, and modern cryptography');
-INSERT INTO search_data (id, keyword, description) VALUES (3, 'authentication', 'OAuth, JWT, and session management');
-INSERT INTO search_data (id, keyword, description) VALUES (4, 'firewall', 'Network security and packet filtering');
-INSERT INTO search_data (id, keyword, description) VALUES (5, 'malware', 'Virus, trojan, and ransomware analysis');
+INSERT INTO search_data (keyword, description) VALUES ('sqlite', 'A lightweight embedded relational database engine');
+INSERT INTO search_data (keyword, description) VALUES ('injection', 'A code injection technique exploiting SQL queries');
+INSERT INTO search_data (keyword, description) VALUES ('firewall', 'A network security system monitoring traffic');
+INSERT INTO search_data (keyword, description) VALUES ('encryption', 'The process of encoding data for confidentiality');
+INSERT INTO search_data (keyword, description) VALUES ('authentication', 'Verifying the identity of a user or process');
 
-INSERT INTO hidden_flags (id, flag_value) VALUES (1, 'FLAG{sq_w4f_n0_st4nd4rd}');
+INSERT INTO hidden_flags (flag_value) VALUES ('FLAG{sl_w4f_n3st3d_byp4ss}');
+INSERT INTO hidden_flags (flag_value) VALUES ('decoy_flag_not_real_001');
+INSERT INTO hidden_flags (flag_value) VALUES ('decoy_flag_not_real_002');

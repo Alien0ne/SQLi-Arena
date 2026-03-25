@@ -5,10 +5,10 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* =====================
-   ADMIN SECRET VERIFY
+   FLAG VERIFY
 ===================== */
-if (isset($_POST['admin_secret'])) {
-    $submitted = $_POST['admin_secret'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['admin_secret'])) {
 
     if ($row && $submitted === $row['admin_secret']) {
         $_SESSION['mysql_lab14_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab14", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab14", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -63,9 +63,9 @@ if (isset($_POST['admin_secret'])) {
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Admin Secret</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="admin_secret" class="input" placeholder="Enter the admin secret..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -111,7 +111,7 @@ if (isset($_POST['fb_name']) && $_POST['fb_name'] !== '') {
     $query = "INSERT INTO feedback (name, comment, rating) VALUES ('$name', '$comment', '$rating')";
 
     // Show the executed query in a terminal block
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '  <div class="terminal-header">';
     echo '    <span class="terminal-dot red"></span>';
     echo '    <span class="terminal-dot yellow"></span>';

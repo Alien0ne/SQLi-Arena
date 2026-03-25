@@ -3,8 +3,7 @@
 -- Oracle Mode -- PL/SQL Syntax
 -- ================================
 
-DROP DATABASE IF EXISTS sqli_arena_mariadb_lab4;
-CREATE DATABASE sqli_arena_mariadb_lab4;
+CREATE DATABASE IF NOT EXISTS sqli_arena_mariadb_lab4;
 USE sqli_arena_mariadb_lab4;
 
 DROP TABLE IF EXISTS oracle_data;
@@ -26,8 +25,7 @@ INSERT INTO oracle_data (name, value) VALUES
 ('PLSQL_COMPAT', 'ENABLED'),
 ('CURSOR_SUPPORT', 'BASIC'),
 ('EXCEPTION_HANDLING', 'PLSQL_STYLE'),
-('PACKAGE_SUPPORT', 'LIMITED'),
 ('ANONYMOUS_BLOCKS', 'SUPPORTED');
 
 INSERT INTO oracle_secrets (secret_value) VALUES
-('FLAG{ma_0r4cl3_m0d3_plsql}');
+('FLAG{ma_0r4cl3_m0d3_p1p3}');

@@ -28,5 +28,5 @@ try {
         echo "Title: {$row['title']} | Content: {$row['content']}";
     }
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

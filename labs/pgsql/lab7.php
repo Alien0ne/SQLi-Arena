@@ -4,16 +4,16 @@ $mode = $_GET['mode'] ?? 'black';
 $verify_error = null;
 
 /* Flag verification */
-if (isset($_POST['flag_input'])) {
-    $submitted = trim($_POST['flag_input']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     $res = pg_query($conn, "SELECT secret_value FROM server_secrets LIMIT 1");
     $row = pg_fetch_assoc($res);
     if ($row && $submitted === $row['secret_value']) {
         $_SESSION['pgsql_lab7_solved'] = true;
-        header("Location: " . url_lab_from_slug("pgsql/lab7", $mode));
+        header("Location: " . url_lab_from_slug("pgsql/lab7", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $verify_error = "Incorrect flag. Keep trying!";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 ?>
@@ -24,23 +24,16 @@ if (isset($_POST['flag_input'])) {
 
     <h4>Scenario</h4>
     <p>
-        This product search page has a UNION injection vulnerability. In addition to extracting database
-        data, PostgreSQL provides functions to read server files: <code>pg_read_file()</code> (superuser only)
-        and <code>COPY ... FROM</code> for bulk import. Your goal is to extract the flag from the
-        <code>server_secrets</code> table and learn the file-read techniques.
+        A product search page has a UNION injection vulnerability. PostgreSQL provides built-in functions
+        to read server files: <code>pg_read_file()</code> (superuser only), <code>COPY ... FROM</code>
+        for bulk import, and <code>pg_ls_dir()</code> for directory listing.
     </p>
-    <p><strong>PostgreSQL Concepts:</strong></p>
-    <ul>
-        <li><code>pg_read_file('/path/to/file')</code>: reads a file (requires superuser)</li>
-        <li><code>COPY table FROM '/path/to/file'</code> -- imports file data into a table</li>
-        <li><code>pg_read_binary_file()</code>: reads binary files</li>
-        <li><code>pg_ls_dir()</code>: lists directory contents</li>
-    </ul>
-    <p><strong>Table Schemas:</strong></p>
-    <ul>
-        <li><code>products(id serial, name varchar, description text)</code></li>
-        <li><code>server_secrets(id serial, secret_value varchar)</code></li>
-    </ul>
+
+    <h4>Objective</h4>
+    <p>
+        Use a UNION-based injection to extract the <strong>secret value</strong> from the
+        <code>server_secrets</code> table, and explore PostgreSQL's file-read capabilities.
+    </p>
 
     <h4>Hints</h4>
     <span class="hint-toggle" data-hint="hint7">&#128161; Click for hints</span>
@@ -49,15 +42,15 @@ if (isset($_POST['flag_input'])) {
         2. Extract the flag from <code>server_secrets</code> using UNION SELECT.<br>
         3. To read files, try: <code>' UNION SELECT 1, pg_read_file('/etc/hostname'), 'x' --</code><br>
         4. If not superuser, use stacked queries with COPY: <code>'; COPY temp_table FROM '/etc/passwd' --</code><br>
-        5. Try: <code>' UNION SELECT id::text, secret_value, 'x' FROM server_secrets --</code>
+        5. Try: <code>' UNION SELECT id, secret_value, secret_value FROM server_secrets --</code>
     </div>
 </div>
 
 <!-- Verify Flag -->
 <div class="card">
-    <h4>Submit Secret Value</h4>
+    <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-        <input type="text" name="flag_input" class="input" placeholder="Enter the secret value..." required>
+        <input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 
@@ -94,7 +87,7 @@ if (isset($_POST['search'])) {
 
     $query = "SELECT id, name, description FROM products WHERE name ILIKE '%$input%'";
 
-    echo '<div class="terminal">';
+    echo '<div class="terminal query-output">';
     echo '<div class="terminal-header">';
     echo '<span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>';
     echo '<span class="terminal-title">PostgreSQL Query</span>';

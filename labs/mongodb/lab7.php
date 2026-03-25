@@ -1,18 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
-/**
- * SQLi-Arena. MongoDB Lab 7: JSON Parameter Pollution
- * Difficulty: Medium
- *
- * Vulnerability: The application accepts JSON body input and uses the parsed values
- * directly in a MongoDB query. By sending operator-laden JSON (e.g., {"password": {"$ne": ""}}),
- * the attacker can override the intended query behavior. The app also processes
- * Content-Type: application/json, converting JSON keys into query parameters.
- *
- * Uses REAL MongoDB server via MongoDB\Driver\Manager ($conn / $mongoDbName from db.php).
- */
 
 $mode = $_GET['mode'] ?? 'black';
+$verify_error = null;
 
 $result_message = null;
 $result_type = null;
@@ -21,15 +11,14 @@ $query_display = null;
 $raw_input_display = null;
 
 // --- Flag verification ---
-if (isset($_POST['flag_answer'])) {
-    $submitted = trim($_POST['flag_answer']);
+if (isset($_POST['flag'])) {
+    $submitted = trim($_POST['flag']);
     if ($submitted === 'FLAG{mg_js0n_p4r4m_p0llut3}') {
         $_SESSION['mongodb_lab7_solved'] = true;
-        header("Location: " . url_lab_from_slug("mongodb/lab7", $mode));
+        header("Location: " . url_lab_from_slug("mongodb/lab7", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
-        $result_message = "Incorrect flag. Keep trying!";
-        $result_type = "error";
+        $verify_error = "Incorrect. Keep trying!";
     }
 }
 
@@ -85,7 +74,7 @@ if (isset($_POST['login_submit']) || (isset($_SERVER['CONTENT_TYPE']) && strpos(
                 $result_type = "error";
             }
         } catch (Exception $e) {
-            $result_message = "Query error: " . $e->getMessage();
+            $result_message = "Query error: " . htmlspecialchars($e->getMessage());
             $result_type = "error";
         }
     }
@@ -98,7 +87,7 @@ if (isset($_POST['login_submit']) || (isset($_SERVER['CONTENT_TYPE']) && strpos(
 
     <h4>Scenario</h4>
     <p>
-        This login API accepts both <code>application/x-www-form-urlencoded</code> and
+        A login API accepts both <code>application/x-www-form-urlencoded</code> and
         <code>application/json</code> content types. When JSON is sent, the parsed object
         is used directly in the MongoDB query. This allows injecting NoSQL operators
         via the JSON body: a technique known as JSON parameter pollution.
@@ -122,13 +111,17 @@ if (isset($_POST['login_submit']) || (isset($_SERVER['CONTENT_TYPE']) && strpos(
     </div>
 </div>
 
-<!-- Flag Submission -->
+<!-- Verify Flag -->
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_answer" class="input" placeholder="FLAG{...}" required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
+
+    <?php if ($verify_error): ?>
+        <div class="result-error result-box"><?= htmlspecialchars($verify_error) ?></div>
+    <?php endif; ?>
 </div>
 
 <!-- Solved Banner -->

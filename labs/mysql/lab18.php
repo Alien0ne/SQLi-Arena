@@ -7,8 +7,8 @@ $verify_error = null;
 /* =====================
    FLAG VERIFY
 ===================== */
-if (isset($_POST['flag_text'])) {
-    $submitted = $_POST['flag_text'];
+if (isset($_POST['flag'])) {
+    $submitted = $_POST['flag'];
 
     $res = mysqli_query(
         $conn,
@@ -18,7 +18,7 @@ if (isset($_POST['flag_text'])) {
 
     if ($row && $submitted === $row['flag_text']) {
         $_SESSION['mysql_lab18_solved'] = true;
-        header("Location: " . url_lab_from_slug("mysql/lab18", $mode));
+        header("Location: " . url_lab_from_slug("mysql/lab18", $mode, $_GET['ref'] ?? ''));
         exit;
     } else {
         $verify_error = "Incorrect. Keep trying!";
@@ -71,7 +71,7 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_P
 // Handle logout
 if ($action === 'logout') {
     unset($_SESSION['lab18_user_id']);
-    header("Location: " . url_lab_from_slug("mysql/lab18", $mode));
+    header("Location: " . url_lab_from_slug("mysql/lab18", $mode, $_GET['ref'] ?? ''));
     exit;
 }
 
@@ -158,7 +158,7 @@ if ($logged_in) {
 <div class="card">
     <h4>Submit Flag</h4>
     <form method="POST" class="form-row">
-<input type="text" name="flag_text" class="input" placeholder="Enter the flag..." required>
+<input type="text" name="flag" class="input" placeholder="Enter the flag..." required>
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 

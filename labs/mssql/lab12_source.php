@@ -30,5 +30,5 @@ try {
         echo "Host: {$row['hostname']} | CPU: {$row['cpu_usage']}%";
     }
 } catch (PDOException $e) {
-    echo "MSSQL Error: " . $e->getMessage();
+    echo "MSSQL Error: " . htmlspecialchars($e->getMessage());
 }

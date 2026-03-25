@@ -92,7 +92,7 @@ echo -e "      ${GREEN}Local databases ready.${NC}"
 # 3. Start Docker containers
 # ----------------------------------------
 echo ""
-echo -e "${YELLOW}[3/7] Starting Docker containers (MSSQL, Oracle, MongoDB, Redis, HQL, GraphQL)...${NC}"
+echo -e "${YELLOW}[3/7] Starting Docker containers (MSSQL, MSSQL-Internal, Oracle, MongoDB, Redis, HQL, GraphQL)...${NC}"
 
 bash "$SETUP_DIR/docker_start.sh"
 
