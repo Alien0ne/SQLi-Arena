@@ -3,6 +3,14 @@
  * SQLi-Arena. Global Configuration
  */
 
+// Persistent sessions (30 days) so progress survives browser restarts
+if (session_status() === PHP_SESSION_NONE) {
+    $lifetime = 60 * 60 * 24 * 30;
+    session_set_cookie_params($lifetime);
+    ini_set('session.gc_maxlifetime', $lifetime);
+    session_start();
+}
+
 // MySQL
 define('MYSQL_HOST', 'localhost');
 define('MYSQL_USER', 'sqli_arena');
