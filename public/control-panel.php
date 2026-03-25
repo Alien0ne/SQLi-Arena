@@ -2,6 +2,17 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/reset_functions.php';
 
+// Handle progress recovery
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['recover_progress']) && csrf_verify()) {
+    $code = $_POST['recovery_code'] ?? '';
+    if (progress_recover($code)) {
+        header("Location: " . url_page('control-panel') . "?recovered=1");
+    } else {
+        header("Location: " . url_page('control-panel') . "?recovered=0");
+    }
+    exit;
+}
+
 // Handle reset all databases POST (form submit)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_all']) && csrf_verify()) {
     foreach (LAB_COUNTS as $engine => $count) {
@@ -16,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cleanup_action'] ?? '') ==
     // Cleanup can take a while (Docker, multiple DB engines) — extend timeout
     set_time_limit(300);
 
-    // Clear session progress first (PHP can do this itself)
+    // Clear all persistent progress + session
+    progress_reset_all();
     session_unset();
     session_destroy();
 
@@ -85,11 +97,7 @@ if (isset($_POST['action'])) {
             break;
 
         case 'clear_progress':
-            foreach ($_SESSION as $k => $v) {
-                if (str_ends_with($k, '_solved')) {
-                    unset($_SESSION[$k]);
-                }
-            }
+            progress_reset_all();
             $result = ['success' => true, 'message' => 'All progress cleared'];
             break;
 
@@ -283,6 +291,17 @@ foreach ($_SESSION as $k => $v) {
     </section>
 
     <!-- Status Messages -->
+    <?php if (isset($_GET['recovered'])): ?>
+        <?php if ($_GET['recovered'] === '1'): ?>
+            <div class="result-success result-box" style="margin-bottom:14px;">
+                Progress recovered successfully.
+            </div>
+        <?php else: ?>
+            <div class="result-error result-box" style="margin-bottom:14px;">
+                Invalid recovery code.
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
     <?php if (isset($_GET['reset']) && $_GET['reset'] === 'success'): ?>
         <div class="result-success result-box" style="margin-bottom:14px;">
             All databases reset to default state.
@@ -312,6 +331,21 @@ foreach ($_SESSION as $k => $v) {
         </div>
         <div style="margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--text-2);">
             Progress: <?= $solved ?>/<?= LAB_TOTAL ?> labs solved
+        </div>
+
+        <!-- Recovery Code -->
+        <div style="margin-top:14px;padding:12px 16px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-2);">
+                    Recovery code: <strong style="color:var(--neon);letter-spacing:1px;"><?= htmlspecialchars(progress_get_recovery_code()) ?></strong>
+                </span>
+                <span style="font-size:11px;color:var(--text-2);opacity:0.7;">Save this to restore progress if cookies are cleared</span>
+            </div>
+            <form method="POST" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                <?= csrf_field() ?>
+                <input type="text" name="recovery_code" placeholder="Enter recovery code" style="padding:6px 10px;font-family:var(--font-mono);font-size:12px;background:var(--bg-1);border:1px solid var(--border);border-radius:4px;color:var(--text-0);width:180px;text-transform:uppercase;letter-spacing:1px;">
+                <button type="submit" name="recover_progress" class="btn btn-ghost btn-sm">Recover Progress</button>
+            </form>
         </div>
     </section>
 

@@ -14,6 +14,14 @@ $labKey    = str_replace('/', '_', $lab);
 $solvedKey = $labKey . '_solved';
 $engine    = explode('/', $lab)[0];
 
+// Sync newly solved labs to persistent SQLite on script exit
+$_solvedBefore = !empty($_SESSION[$solvedKey]);
+register_shutdown_function(function() use ($solvedKey, $_solvedBefore) {
+    if (!$_solvedBefore && !empty($_SESSION[$solvedKey])) {
+        progress_mark_solved($solvedKey);
+    }
+});
+
 $labFile      = __DIR__ . "/../labs/$lab.php";
 $sourceFile   = __DIR__ . "/../labs/{$lab}_source.php";
 $solutionFile = __DIR__ . "/../labs/{$lab}_solution.php";
@@ -23,7 +31,7 @@ if (!is_readable($labFile)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_lab']) && csrf_verify()) {
-    unset($_SESSION[$solvedKey]);
+    progress_reset_lab($solvedKey);
 
     // Also reset the actual database for this lab
     require_once __DIR__ . '/../includes/reset_functions.php';

@@ -8,8 +8,6 @@
 
 require_once __DIR__ . '/config.php';
 
-session_start();
-
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -42,12 +40,8 @@ while ($row = mysqli_fetch_row($result)) {
     }
 }
 
-// Clear all solved session keys
-foreach ($_SESSION as $k => $v) {
-    if (str_ends_with($k, '_solved')) {
-        unset($_SESSION[$k]);
-    }
-}
+// Clear all progress (SQLite + session)
+progress_reset_all();
 
 // Remove SQLite files if they exist
 $sqliteDir = SQLITE_DIR;

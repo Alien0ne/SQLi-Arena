@@ -3,13 +3,17 @@
  * SQLi-Arena. Global Configuration
  */
 
-// Persistent sessions (1 year) so progress survives browser restarts
+// Session setup
 if (session_status() === PHP_SESSION_NONE) {
     $lifetime = 60 * 60 * 24 * 365;
     session_set_cookie_params($lifetime);
     ini_set('session.gc_maxlifetime', $lifetime);
     session_start();
 }
+
+// Persistent progress (SQLite-backed, survives cookie loss)
+require_once __DIR__ . '/progress.php';
+progress_load_to_session();
 
 // MySQL
 define('MYSQL_HOST', 'localhost');
